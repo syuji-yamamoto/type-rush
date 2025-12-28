@@ -1,0 +1,35 @@
+# Backend (Laravel)
+/backend/vendor/
+/backend/node_modules/
+/backend/.env
+/backend/.env.backup
+/backend/storage/*.key
+/backend/Homestead.yaml
+/backend/Homestead.json
+/backend/npm-debug.log
+/backend/yarn-error.log
+
+# Frontend (React)
+/frontend/node_modules/
+/frontend/dist/
+/frontend/.env
+/frontend/.env.local
+/frontend/.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker/mysql/data/
+
+# Logs
+*.log
+logs/

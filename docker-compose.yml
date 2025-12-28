@@ -1,0 +1,59 @@
+services:
+  # MySQL データベース
+  db:
+    image: mysql:8.0
+    container_name: type-rush-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: type_rush
+      MYSQL_USER: type_rush_user
+      MYSQL_PASSWORD: type_rush_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+    networks:
+      - type-rush-network
+
+  # phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: type-rush-phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    networks:
+      - type-rush-network
+
+  # Laravel バックエンド
+  backend:
+    build:
+      context: ./docker/backend
+      dockerfile: Dockerfile
+    container_name: type-rush-backend
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+      - ./docker/backend/php.ini:/usr/local/etc/php/conf.d/custom.ini
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    networks:
+      - type-rush-network
+
+networks:
+  type-rush-network:
+    driver: bridge
+
+volumes:
+  db_data:

@@ -1,0 +1,30 @@
+# Laravelバックエンドの.gitkeep
+# Laravel をインストール後、このファイルは削除可能です
+
+## セットアップ手順
+
+1. Dockerコンテナを起動:
+   ```
+   docker-compose up -d
+   ```
+
+2. バックエンドコンテナに入る:
+   ```
+   docker-compose exec backend bash
+   ```
+
+3. Laravelプロジェクトを作成:
+   ```
+   composer create-project laravel/laravel .
+   ```
+
+4. .env設定:
+   - DB_HOST=db
+   - DB_DATABASE=type_rush
+   - DB_USERNAME=type_rush_user
+   - DB_PASSWORD=type_rush_password
+
+5. マイグレーション:
+   ```
+   php artisan migrate
+   ```
