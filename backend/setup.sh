@@ -1,14 +1,22 @@
-#!/bin/bash
+#!/bin/sh
 
 # Laravel プロジェクトのセットアップスクリプト
 # Docker コンテナ内で実行してください
+
+set -eu
 
 echo "🚀 Laravel プロジェクトをセットアップしています..."
 
 # Laravel がインストールされていない場合は新規作成
 if [ ! -f "artisan" ]; then
     echo "📦 Laravel をインストールしています..."
-    composer create-project laravel/laravel . --prefer-dist
+
+    # backend/ には setup.sh や .gitkeep がありディレクトリが空ではないため、
+    # 一時ディレクトリに作成してから中身をコピーします
+    TMP_DIR="/tmp/laravel-setup-$$"
+    composer create-project laravel/laravel "$TMP_DIR" --prefer-dist
+    cp -a "$TMP_DIR"/. .
+    rm -rf "$TMP_DIR"
 fi
 
 # .env ファイルの設定
