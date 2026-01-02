@@ -5,10 +5,10 @@ services:
     container_name: type-rush-db
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: type_rush
-      MYSQL_USER: type_rush_user
-      MYSQL_PASSWORD: type_rush_password
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
       - "3306:3306"
     volumes:
@@ -16,6 +16,8 @@ services:
       - ./docker/mysql/init:/docker-entrypoint-initdb.d
     networks:
       - type-rush-network
+    env_file:
+      - ./backend/.env
 
   # phpMyAdmin
   phpmyadmin:
@@ -50,6 +52,8 @@ services:
       - db
     networks:
       - type-rush-network
+    env_file:
+      - ./backend/.env
 
 networks:
   type-rush-network:

@@ -9,15 +9,20 @@
 - TypeScript
 - React
 - Tailwind CSS
+- サービス名: frontend
 
 ### バックエンド
 
 - PHP
 - Laravel
+- Docker サービス名: backend
 
 ### データベース
 
 - MySQL
+- Docker サービス名: db
+- phpMyAdmin (データベース管理用)
+- Docker サービス名: phpmyadmin
 
 ### インフラ
 
@@ -109,6 +114,7 @@ docker compose exec backend bash
 ```
 
 #### フロントエンド
+
 ```bash
 # 開発サーバー起動
 npm run dev
