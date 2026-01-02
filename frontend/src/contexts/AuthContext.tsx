@@ -5,8 +5,8 @@ import {
   useEffect,
   ReactNode,
 } from "react";
+import { User } from "../types/interfaces";
 import {
-  User,
   login as apiLogin,
   register as apiRegister,
   logout as apiLogout,

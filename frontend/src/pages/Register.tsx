@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { AxiosError } from "axios";
-import { ApiError } from "../api/auth";
+import { ApiError } from "../types/interfaces";
 
 function Register() {
   const [name, setName] = useState("");
