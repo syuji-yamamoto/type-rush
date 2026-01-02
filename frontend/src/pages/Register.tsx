@@ -1,121 +1,142 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { AxiosError } from "axios";
+import { ApiError } from "../api/auth";
 
 function Register() {
-    const [name, setName] = useState('')
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [passwordConfirmation, setPasswordConfirmation] = useState('')
-    const [error, setError] = useState('')
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordConfirmation, setPasswordConfirmation] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { register } = useAuth();
+  const navigate = useNavigate();
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setError('')
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
 
-        if (password !== passwordConfirmation) {
-            setError('パスワードが一致しません')
-            return
-        }
-        
-        // TODO: APIと連携
-        console.log('Register attempt:', { name, email, password })
+    if (password !== passwordConfirmation) {
+      setError("パスワードが一致しません");
+      return;
     }
 
-    return (
-        <div className="min-h-screen flex flex-col items-center justify-center p-4">
-            <div className="w-full max-w-md">
-                <h1 className="text-3xl font-bold text-white text-center mb-8">
-                    新規登録
-                </h1>
+    setIsLoading(true);
 
-                <form onSubmit={handleSubmit} className="bg-slate-800 rounded-lg p-8">
-                    {error && (
-                        <div className="bg-red-500/20 text-red-400 p-3 rounded mb-4">
-                            {error}
-                        </div>
-                    )}
+    try {
+      await register(name, email, password, passwordConfirmation);
+      navigate("/");
+    } catch (err) {
+      const error = err as AxiosError<ApiError>;
+      if (error.response?.data?.errors) {
+        const errorMessages = Object.values(error.response.data.errors).flat();
+        setError(errorMessages.join("\n"));
+      } else if (error.response?.data?.message) {
+        setError(error.response.data.message);
+      } else {
+        setError("登録に失敗しました");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-                    <div className="mb-6">
-                        <label className="block text-gray-300 mb-2">
-                            ユーザー名
-                        </label>
-                        <input
-                            type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className="w-full bg-slate-700 text-white p-3 rounded-lg outline-none focus:ring-2 focus:ring-cyan-400"
-                            placeholder="ユーザー名"
-                            required
-                        />
-                    </div>
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <h1 className="text-3xl font-bold text-white text-center mb-8">
+          新規登録
+        </h1>
 
-                    <div className="mb-6">
-                        <label className="block text-gray-300 mb-2">
-                            メールアドレス
-                        </label>
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full bg-slate-700 text-white p-3 rounded-lg outline-none focus:ring-2 focus:ring-cyan-400"
-                            placeholder="example@email.com"
-                            required
-                        />
-                    </div>
-
-                    <div className="mb-6">
-                        <label className="block text-gray-300 mb-2">
-                            パスワード
-                        </label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full bg-slate-700 text-white p-3 rounded-lg outline-none focus:ring-2 focus:ring-cyan-400"
-                            placeholder="••••••••"
-                            required
-                            minLength={8}
-                        />
-                    </div>
-
-                    <div className="mb-6">
-                        <label className="block text-gray-300 mb-2">
-                            パスワード（確認）
-                        </label>
-                        <input
-                            type="password"
-                            value={passwordConfirmation}
-                            onChange={(e) => setPasswordConfirmation(e.target.value)}
-                            className="w-full bg-slate-700 text-white p-3 rounded-lg outline-none focus:ring-2 focus:ring-cyan-400"
-                            placeholder="••••••••"
-                            required
-                            minLength={8}
-                        />
-                    </div>
-
-                    <button
-                        type="submit"
-                        className="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-8 rounded-lg transition-all"
-                    >
-                        登録
-                    </button>
-
-                    <p className="text-gray-400 text-center mt-6">
-                        すでにアカウントをお持ちの方は{' '}
-                        <Link to="/login" className="text-cyan-400 hover:underline">
-                            ログイン
-                        </Link>
-                    </p>
-                </form>
-
-                <div className="text-center mt-4">
-                    <Link to="/" className="text-gray-300 hover:text-white">
-                        ← ホームに戻る
-                    </Link>
-                </div>
+        <form onSubmit={handleSubmit} className="bg-slate-800 rounded-lg p-8">
+          {error && (
+            <div className="bg-red-500/20 text-red-400 p-3 rounded mb-4 whitespace-pre-line">
+              {error}
             </div>
+          )}
+
+          <div className="mb-6">
+            <label className="block text-gray-300 mb-2">ユーザー名</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full bg-slate-700 text-white p-3 rounded-lg outline-none focus:ring-2 focus:ring-cyan-400"
+              placeholder="ユーザー名"
+              required
+              disabled={isLoading}
+            />
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-gray-300 mb-2">メールアドレス</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-slate-700 text-white p-3 rounded-lg outline-none focus:ring-2 focus:ring-cyan-400"
+              placeholder="example@email.com"
+              required
+              disabled={isLoading}
+            />
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-gray-300 mb-2">パスワード</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-slate-700 text-white p-3 rounded-lg outline-none focus:ring-2 focus:ring-cyan-400"
+              placeholder="••••••••"
+              required
+              minLength={8}
+              disabled={isLoading}
+            />
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-gray-300 mb-2">
+              パスワード（確認）
+            </label>
+            <input
+              type="password"
+              value={passwordConfirmation}
+              onChange={(e) => setPasswordConfirmation(e.target.value)}
+              className="w-full bg-slate-700 text-white p-3 rounded-lg outline-none focus:ring-2 focus:ring-cyan-400"
+              placeholder="••••••••"
+              required
+              minLength={8}
+              disabled={isLoading}
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-cyan-500 hover:bg-cyan-600 disabled:bg-cyan-700 disabled:cursor-not-allowed text-white font-bold py-3 px-8 rounded-lg transition-all"
+          >
+            {isLoading ? "登録中..." : "登録"}
+          </button>
+
+          <p className="text-gray-400 text-center mt-6">
+            すでにアカウントをお持ちの方は{" "}
+            <Link to="/login" className="text-cyan-400 hover:underline">
+              ログイン
+            </Link>
+          </p>
+        </form>
+
+        <div className="text-center mt-4">
+          <Link to="/" className="text-gray-300 hover:text-white">
+            ← ホームに戻る
+          </Link>
         </div>
-    )
+      </div>
+    </div>
+  );
 }
 
-export default Register
+export default Register;
