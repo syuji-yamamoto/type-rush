@@ -13,9 +13,19 @@ class UserSeeder extends Seeder
 
     /**
      * Run the database seeds.
+     * 
+     * ⚠️ 開発用のシーダーです
+     * - 本番環境では実行しないでください
+     * - パスワードは固定値（password123）を使用しています
      */
     public function run(): void
     {
+        // 本番環境ではシーダーを実行しない
+        if (app()->environment('production')) {
+            $this->command->warn('⚠️ Seeder is disabled in production environment.');
+            return;
+        }
+
         $users = [
             [
                 'name' => '山田太郎',

@@ -29,9 +29,14 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      // 401エラー時にトークンを削除
       localStorage.removeItem("auth_token");
-      localStorage.removeItem("user");
-      window.location.href = "/login";
+
+      // 既にログインページやレジスター画面にいる場合はリダイレクトしない（無限ループ防止）
+      const currentPath = window.location.pathname;
+      if (currentPath !== "/login" && currentPath !== "/register") {
+        window.location.href = "/login";
+      }
     }
     return Promise.reject(error);
   }

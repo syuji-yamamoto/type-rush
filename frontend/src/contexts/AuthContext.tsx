@@ -42,7 +42,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setUser(userData);
         } catch {
           localStorage.removeItem("auth_token");
-          localStorage.removeItem("user");
         }
       }
       setIsLoading(false);
@@ -53,7 +52,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string) => {
     const response = await apiLogin(email, password);
     localStorage.setItem("auth_token", response.token);
-    localStorage.setItem("user", JSON.stringify(response.user));
     setUser(response.user);
   };
 
@@ -70,7 +68,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       passwordConfirmation
     );
     localStorage.setItem("auth_token", response.token);
-    localStorage.setItem("user", JSON.stringify(response.user));
     setUser(response.user);
   };
 
@@ -79,7 +76,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       await apiLogout();
     } finally {
       localStorage.removeItem("auth_token");
-      localStorage.removeItem("user");
       setUser(null);
     }
   };
