@@ -17,8 +17,11 @@ return [
 
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
+    // 全てのHTTPメソッドを許可。許可するメソッドを限定することもできる。
     'allowed_methods' => ['*'],
 
+    // 許可するオリジンを設定する。
+    // TODO: 本番でドメイン決定後に修正すること
     'allowed_origins' => explode(',', env('CORS_ALLOWED_ORIGINS', 'http://localhost:3000, http://localhost:5173')),
 
     'allowed_origins_patterns' => [],
