@@ -1,8 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import type { JapaneseText } from "../types/types";
+import {
+  getRandomSampleText,
+  type Difficulty,
+  type Language,
+} from "../api/sampleText";
 
-const japaneseTexts: JapaneseText[] = [
+// フォールバック用のローカルテキスト（API障害時用）
+const fallbackJapaneseTexts: JapaneseText[] = [
   {
     display: "今日はいい天気ですね",
     reading: "きょうはいいてんきですね",
@@ -13,37 +19,19 @@ const japaneseTexts: JapaneseText[] = [
     reading: "ぷろぐらみんぐはたのしい",
     romaji: "puroguraminguhatanoshii",
   },
-  {
-    display: "練習すれば上達します",
-    reading: "れんしゅうすればじょうたつします",
-    romaji: "renshuusurebajotatusimasu",
-  },
-  {
-    display: "リアクトは便利なライブラリです",
-    reading: "りあくとはべんりならいぶらりです",
-    romaji: "riakutohabennrinaraiburari",
-  },
-  {
-    display: "タイプスクリプトを使おう",
-    reading: "たいぷすくりぷとをつかおう",
-    romaji: "taipusukuriputowotsukaou",
-  },
 ];
 
-// 英語サンプルテキスト
-const sampleTexts = [
+const fallbackEnglishTexts = [
   "the quick brown fox jumps over the lazy dog",
   "programming is the art of telling a computer what to do",
-  "practice makes perfect when it comes to typing",
-  "react is a javascript library for building user interfaces",
-  "typescript adds static type checking to javascript",
 ];
 
 function Game() {
   const [gameState, setGameState] = useState<"ready" | "playing" | "finished">(
     "ready"
   );
-  const [language, setLanguage] = useState<"english" | "japanese">("english");
+  const [language, setLanguage] = useState<Language>("english");
+  const [difficulty, setDifficulty] = useState<Difficulty>("intermediate");
   const [currentText, setCurrentText] = useState("");
   const [currentJapaneseText, setCurrentJapaneseText] =
     useState<JapaneseText | null>(null);
@@ -55,32 +43,64 @@ function Game() {
   const [volume, setVolume] = useState(50);
   const [isMuted, setIsMuted] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // テキストをランダムに選択
-  const getRandomText = useCallback(() => {
-    if (language === "japanese") {
-      const text =
-        japaneseTexts[Math.floor(Math.random() * japaneseTexts.length)];
-      setCurrentJapaneseText(text);
-      return text.romaji;
-    } else {
-      setCurrentJapaneseText(null);
-      return sampleTexts[Math.floor(Math.random() * sampleTexts.length)];
+  // APIからテキストを取得
+  const fetchRandomText = useCallback(async (): Promise<string> => {
+    setIsLoading(true);
+    try {
+      const response = await getRandomSampleText(language, difficulty);
+
+      if (language === "japanese") {
+        setCurrentJapaneseText({
+          display: response.display_text || "",
+          reading: response.reading || "",
+          romaji: response.text,
+        });
+        return response.text;
+      } else {
+        setCurrentJapaneseText(null);
+        return response.text;
+      }
+    } catch (error) {
+      console.error("サンプルテキストの取得に失敗しました:", error);
+      // フォールバック：ローカルテキストを使用
+      if (language === "japanese") {
+        const text =
+          fallbackJapaneseTexts[
+            Math.floor(Math.random() * fallbackJapaneseTexts.length)
+          ];
+        setCurrentJapaneseText(text);
+        return text.romaji;
+      } else {
+        setCurrentJapaneseText(null);
+        return fallbackEnglishTexts[
+          Math.floor(Math.random() * fallbackEnglishTexts.length)
+        ];
+      }
+    } finally {
+      setIsLoading(false);
     }
-  }, [language]);
+  }, [language, difficulty]);
+
+  // 次のテキストを取得
+  const getNextText = useCallback(async () => {
+    const text = await fetchRandomText();
+    setCurrentText(text);
+  }, [fetchRandomText]);
 
   // ゲーム開始
-  const startGame = useCallback(() => {
+  const startGame = useCallback(async () => {
     setGameState("playing");
-    setCurrentText(getRandomText());
     setUserInput("");
     setTimeLeft(60);
     setCorrectChars(0);
     setTotalChars(0);
     setWordsCompleted(0);
+    await getNextText();
     inputRef.current?.focus();
-  }, [getRandomText]);
+  }, [getNextText]);
 
   // タイマー
   useEffect(() => {
@@ -99,8 +119,22 @@ function Game() {
     return () => clearInterval(timer);
   }, [gameState]);
 
+  // 難易度表示用のラベル
+  const getDifficultyLabel = (diff: Difficulty): string => {
+    switch (diff) {
+      case "beginner":
+        return "初級";
+      case "intermediate":
+        return "中級";
+      case "advanced":
+        return "上級";
+      default:
+        return "中級";
+    }
+  };
+
   // 入力処理
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (gameState !== "playing" || isComposing) return;
 
     const value = e.target.value.toLowerCase();
@@ -109,14 +143,10 @@ function Game() {
 
     // 正解チェック
     if (value === currentText) {
-      console.log(value);
-
       setCorrectChars((prev) => prev + currentText.length);
       setWordsCompleted((prev) => prev + 1);
-      setCurrentText(getRandomText());
       setUserInput("");
-    } else if (currentText.startsWith(value)) {
-      // 途中まで正解
+      await getNextText();
     }
   };
 
@@ -125,7 +155,7 @@ function Game() {
     setIsComposing(true);
   };
 
-  const handleCompositionEnd = (
+  const handleCompositionEnd = async (
     e: React.CompositionEvent<HTMLInputElement>
   ) => {
     setIsComposing(false);
@@ -134,12 +164,13 @@ function Game() {
       const value = (e.target as HTMLInputElement).value.toLowerCase();
       setUserInput(value);
       setTotalChars((prev) => prev + 1);
+      console.log(value);
 
       if (value === currentText) {
         setCorrectChars((prev) => prev + currentText.length);
         setWordsCompleted((prev) => prev + 1);
-        setCurrentText(getRandomText());
         setUserInput("");
+        await getNextText();
       }
     }
   };
@@ -191,7 +222,7 @@ function Game() {
             <h2 className="text-3xl text-white mb-8">準備はいいですか？</h2>
 
             {/* 言語選択 */}
-            <div className="mb-8">
+            <div className="mb-6">
               <p className="text-gray-300 mb-4">言語を選択:</p>
               <div className="flex justify-center gap-4">
                 <button
@@ -217,11 +248,34 @@ function Game() {
               </div>
             </div>
 
+            {/* 難易度選択 */}
+            <div className="mb-8">
+              <p className="text-gray-300 mb-4">難易度を選択:</p>
+              <div className="flex justify-center gap-4">
+                {(["beginner", "intermediate", "advanced"] as Difficulty[]).map(
+                  (diff) => (
+                    <button
+                      key={diff}
+                      onClick={() => setDifficulty(diff)}
+                      className={`px-6 py-3 rounded-lg font-bold transition-all ${
+                        difficulty === diff
+                          ? "bg-cyan-500 text-white"
+                          : "bg-gray-600 text-gray-300 hover:bg-gray-500"
+                      }`}
+                    >
+                      {getDifficultyLabel(diff)}
+                    </button>
+                  )
+                )}
+              </div>
+            </div>
+
             <button
               onClick={startGame}
-              className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-4 px-12 rounded-lg text-xl transition-all transform hover:scale-105"
+              disabled={isLoading}
+              className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-4 px-12 rounded-lg text-xl transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              スタート
+              {isLoading ? "読み込み中..." : "スタート"}
             </button>
           </div>
         )}
@@ -236,69 +290,82 @@ function Game() {
               <div className="text-right">
                 <div className="text-gray-300">WPM: {calculateWPM()}</div>
                 <div className="text-gray-300">完了: {wordsCompleted}</div>
+                <div className="text-gray-400 text-sm">
+                  {getDifficultyLabel(difficulty)}
+                </div>
               </div>
             </div>
 
             {/* タイピングエリア */}
             <div className="bg-slate-800 rounded-lg p-6 mb-4">
-              {/* 日本語の場合：ルビ表示 */}
-              {language === "japanese" && currentJapaneseText && (
-                <div className="mb-4">
-                  <p className="text-3xl text-white mb-2 leading-relaxed">
-                    {currentJapaneseText.display
-                      .split("")
-                      .map((char, index) => {
-                        // 入力状態に基づく色分け
-                        let rubyClassName = "text-gray-400 text-sm";
-
-                        // 簡易的な進捗計算（入力の進行度合い）
-                        const progress = userInput.length / currentText.length;
-                        const charProgress =
-                          index / currentJapaneseText.display.length;
-
-                        if (charProgress < progress) {
-                          // 入力済みの部分
-                          const isCorrect = currentText.startsWith(userInput);
-                          rubyClassName = isCorrect
-                            ? "text-green-400 text-sm font-bold"
-                            : "text-red-400 text-sm font-bold";
-                        }
-
-                        return (
-                          <ruby key={index}>
-                            {char}
-                            <rt className={rubyClassName}>
-                              {currentJapaneseText.reading[index] || ""}
-                            </rt>
-                          </ruby>
-                        );
-                      })}
-                  </p>
-                  <div className="text-xs text-gray-500 mt-2">
-                    ローマ字入力: {currentJapaneseText.romaji}
-                  </div>
+              {isLoading ? (
+                <div className="text-center text-gray-400 py-8">
+                  読み込み中...
                 </div>
-              )}
+              ) : (
+                <>
+                  {/* 日本語の場合：ルビ表示 */}
+                  {language === "japanese" && currentJapaneseText && (
+                    <div className="mb-4">
+                      <p className="text-3xl text-white mb-2 leading-relaxed">
+                        {currentJapaneseText.display
+                          .split("")
+                          .map((char, index) => {
+                            // 入力状態に基づく色分け
+                            let rubyClassName = "text-gray-400 text-sm";
 
-              {/* ローマ字/英語表示 */}
-              <p className="text-2xl text-gray-300 font-mono mb-4 leading-relaxed">
-                {currentText.split("").map((char, index) => {
-                  let className = "text-gray-500";
-                  if (index < userInput.length) {
-                    className =
-                      userInput[index] === char
-                        ? "text-green-400"
-                        : "text-red-400 bg-red-900/30";
-                  } else if (index === userInput.length) {
-                    className = "text-white border-l-2 border-cyan-400";
-                  }
-                  return (
-                    <span key={index} className={className}>
-                      {char}
-                    </span>
-                  );
-                })}
-              </p>
+                            // 簡易的な進捗計算（入力の進行度合い）
+                            const progress =
+                              userInput.length / currentText.length;
+                            const charProgress =
+                              index / currentJapaneseText.display.length;
+
+                            if (charProgress < progress) {
+                              // 入力済みの部分
+                              const isCorrect =
+                                currentText.startsWith(userInput);
+                              rubyClassName = isCorrect
+                                ? "text-green-400 text-sm font-bold"
+                                : "text-red-400 text-sm font-bold";
+                            }
+
+                            return (
+                              <ruby key={index}>
+                                {char}
+                                <rt className={rubyClassName}>
+                                  {currentJapaneseText.reading[index] || ""}
+                                </rt>
+                              </ruby>
+                            );
+                          })}
+                      </p>
+                      <div className="text-xs text-gray-500 mt-2">
+                        ローマ字入力: {currentJapaneseText.romaji}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ローマ字/英語表示 */}
+                  <p className="text-2xl text-gray-300 font-mono mb-4 leading-relaxed">
+                    {currentText.split("").map((char, index) => {
+                      let className = "text-gray-500";
+                      if (index < userInput.length) {
+                        className =
+                          userInput[index] === char
+                            ? "text-green-400"
+                            : "text-red-400 bg-red-900/30";
+                      } else if (index === userInput.length) {
+                        className = "text-white border-l-2 border-cyan-400";
+                      }
+                      return (
+                        <span key={index} className={className}>
+                          {char}
+                        </span>
+                      );
+                    })}
+                  </p>
+                </>
+              )}
             </div>
 
             {/* 入力フィールド */}
@@ -314,6 +381,7 @@ function Game() {
                 language === "japanese" ? "ローマ字で入力..." : "ここに入力..."
               }
               autoFocus
+              disabled={isLoading}
             />
           </div>
         )}
@@ -343,6 +411,12 @@ function Game() {
                   <p className="text-gray-400">正確な文字数</p>
                   <p className="text-2xl text-white">{correctChars}</p>
                 </div>
+              </div>
+              <div className="mt-4 pt-4 border-t border-gray-700">
+                <p className="text-gray-400 text-sm">
+                  言語: {language === "english" ? "English" : "日本語"} /
+                  難易度: {getDifficultyLabel(difficulty)}
+                </p>
               </div>
             </div>
             <div className="space-x-4">
