@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SampleTextController;
+use App\Http\Controllers\ScoreController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,4 +19,9 @@ Route::get('/sample-texts/difficulties', [SampleTextController::class, 'getDiffi
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
+
+    // スコア関連
+    Route::post('/scores', [ScoreController::class, 'store']);
+    Route::get('/scores/stats', [ScoreController::class, 'stats']);
+    Route::get('/scores/history', [ScoreController::class, 'history']);
 });

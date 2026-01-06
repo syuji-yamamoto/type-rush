@@ -6,6 +6,8 @@ import {
   type Difficulty,
   type Language,
 } from "../api/sampleText";
+import { saveScore } from "../api/score";
+import { useAuth } from "../contexts/AuthContext";
 
 // フォールバック用のローカルテキスト（API障害時用）
 const fallbackJapaneseTexts: JapaneseText[] = [
@@ -27,11 +29,12 @@ const fallbackEnglishTexts = [
 ];
 
 function Game() {
+  const { isAuthenticated } = useAuth();
   const [gameState, setGameState] = useState<"ready" | "playing" | "finished">(
     "ready"
   );
   const [language, setLanguage] = useState<Language>("english");
-  const [difficulty, setDifficulty] = useState<Difficulty>("intermediate");
+  const [difficulty, setDifficulty] = useState<Difficulty>("beginner");
   const [currentText, setCurrentText] = useState("");
   const [currentJapaneseText, setCurrentJapaneseText] =
     useState<JapaneseText | null>(null);
@@ -44,7 +47,17 @@ function Game() {
   const [isMuted, setIsMuted] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [scoreSaved, setScoreSaved] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // 利用可能な難易度を取得
+  const getAvailableDifficulties = (): Difficulty[] => {
+    if (isAuthenticated) {
+      return ["beginner", "intermediate", "advanced"];
+    }
+    return ["beginner"];
+  };
 
   // APIからテキストを取得
   const fetchRandomText = useCallback(async (): Promise<string> => {
@@ -98,6 +111,7 @@ function Game() {
     setCorrectChars(0);
     setTotalChars(0);
     setWordsCompleted(0);
+    setScoreSaved(false);
     await getNextText();
     inputRef.current?.focus();
   }, [getNextText]);
@@ -187,6 +201,28 @@ function Game() {
     return Math.round((correctChars / totalChars) * 100);
   };
 
+  // スコア保存（上級クリア時のみ）
+  const handleSaveScore = async () => {
+    if (!isAuthenticated || difficulty !== "advanced" || scoreSaved) return;
+
+    setIsSaving(true);
+    try {
+      await saveScore({
+        wpm: calculateWPM(),
+        accuracy: calculateAccuracy(),
+        correct_chars: correctChars,
+        words_completed: wordsCompleted,
+        language,
+        difficulty: "advanced",
+      });
+      setScoreSaved(true);
+    } catch (error) {
+      console.error("スコアの保存に失敗しました:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       {/* ヘッダー */}
@@ -253,21 +289,39 @@ function Game() {
               <p className="text-gray-300 mb-4">難易度を選択:</p>
               <div className="flex justify-center gap-4">
                 {(["beginner", "intermediate", "advanced"] as Difficulty[]).map(
-                  (diff) => (
-                    <button
-                      key={diff}
-                      onClick={() => setDifficulty(diff)}
-                      className={`px-6 py-3 rounded-lg font-bold transition-all ${
-                        difficulty === diff
-                          ? "bg-cyan-500 text-white"
-                          : "bg-gray-600 text-gray-300 hover:bg-gray-500"
-                      }`}
-                    >
-                      {getDifficultyLabel(diff)}
-                    </button>
-                  )
+                  (diff) => {
+                    const isAvailable =
+                      getAvailableDifficulties().includes(diff);
+                    return (
+                      <button
+                        key={diff}
+                        onClick={() => isAvailable && setDifficulty(diff)}
+                        disabled={!isAvailable}
+                        className={`px-6 py-3 rounded-lg font-bold transition-all ${
+                          difficulty === diff
+                            ? "bg-cyan-500 text-white"
+                            : isAvailable
+                            ? "bg-gray-600 text-gray-300 hover:bg-gray-500"
+                            : "bg-gray-700 text-gray-500 cursor-not-allowed"
+                        }`}
+                        title={!isAvailable ? "ログインすると利用可能" : ""}
+                      >
+                        {getDifficultyLabel(diff)}
+                        {!isAvailable && " 🔒"}
+                      </button>
+                    );
+                  }
                 )}
               </div>
+              {!isAuthenticated && (
+                <p className="text-yellow-400 text-sm mt-4">
+                  💡{" "}
+                  <Link to="/login" className="underline hover:text-yellow-300">
+                    ログイン
+                  </Link>
+                  すると中級・上級がプレイできます
+                </p>
+              )}
             </div>
 
             <button
@@ -418,6 +472,52 @@ function Game() {
                   難易度: {getDifficultyLabel(difficulty)}
                 </p>
               </div>
+
+              {/* スコア保存セクション（上級のみ） */}
+              {isAuthenticated && difficulty === "advanced" && (
+                <div className="mt-4 pt-4 border-t border-gray-700">
+                  {scoreSaved ? (
+                    <p className="text-green-400">
+                      ✅ スコアを保存しました！
+                      <Link
+                        to="/results"
+                        className="underline ml-2 hover:text-green-300"
+                      >
+                        履歴を見る
+                      </Link>
+                    </p>
+                  ) : (
+                    <button
+                      onClick={handleSaveScore}
+                      disabled={isSaving}
+                      className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-6 rounded-lg transition-all disabled:opacity-50"
+                    >
+                      {isSaving ? "保存中..." : "🏆 スコアを保存"}
+                    </button>
+                  )}
+                </div>
+              )}
+              {isAuthenticated && difficulty !== "advanced" && (
+                <div className="mt-4 pt-4 border-t border-gray-700">
+                  <p className="text-yellow-400 text-sm">
+                    💡 上級をクリアするとスコアを保存できます
+                  </p>
+                </div>
+              )}
+              {!isAuthenticated && (
+                <div className="mt-4 pt-4 border-t border-gray-700">
+                  <p className="text-yellow-400 text-sm">
+                    💡{" "}
+                    <Link
+                      to="/login"
+                      className="underline hover:text-yellow-300"
+                    >
+                      ログイン
+                    </Link>
+                    して上級をクリアするとスコアを保存できます
+                  </p>
+                </div>
+              )}
             </div>
             <div className="space-x-4">
               <button
