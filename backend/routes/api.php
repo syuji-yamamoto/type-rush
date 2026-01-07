@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// サンプルテキスト関連（認証不要）
+// サンプルテキスト関連（難易度による制限あり - コントローラー側でチェック）
 Route::get('/sample-texts/random', [SampleTextController::class, 'getRandom']);
 Route::get('/sample-texts/random-list', [SampleTextController::class, 'getRandomList']);
 Route::get('/sample-texts/difficulties', [SampleTextController::class, 'getDifficulties']);

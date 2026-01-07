@@ -49,6 +49,7 @@ function Game() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [scoreSaved, setScoreSaved] = useState(false);
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // 利用可能な難易度を取得
@@ -132,6 +133,7 @@ function Game() {
     setTotalChars(0);
     setWordsCompleted(0);
     setScoreSaved(false);
+    setCurrentSessionId(`${Date.now()}-${Math.random()}`);
     await getNextText();
     inputRef.current?.focus();
   }, [getNextText]);
@@ -172,12 +174,26 @@ function Game() {
     if (gameState !== "playing" || isComposing) return;
 
     const value = e.target.value.toLowerCase();
+    const prevLength = userInput.length;
+    const newLength = value.length;
+
     setUserInput(value);
-    setTotalChars((prev) => prev + 1);
+
+    // 文字が追加された場合のみ処理（削除時は無視）
+    if (newLength > prevLength) {
+      // 追加された文字の正誤判定
+      const addedChar = value[newLength - 1];
+      const expectedChar = currentText[newLength - 1];
+
+      setTotalChars((prev) => prev + 1);
+
+      if (addedChar === expectedChar) {
+        setCorrectChars((prev) => prev + 1);
+      }
+    }
 
     // 正解チェック
     if (value === currentText) {
-      setCorrectChars((prev) => prev + currentText.length);
       setWordsCompleted((prev) => prev + 1);
       setUserInput("");
       await getNextText();
@@ -194,19 +210,7 @@ function Game() {
   ) => {
     setIsComposing(false);
     // IME確定後の入力処理
-    if (gameState === "playing") {
-      const value = (e.target as HTMLInputElement).value.toLowerCase();
-      setUserInput(value);
-      setTotalChars((prev) => prev + 1);
-      console.log(value);
-
-      if (value === currentText) {
-        setCorrectChars((prev) => prev + currentText.length);
-        setWordsCompleted((prev) => prev + 1);
-        setUserInput("");
-        await getNextText();
-      }
-    }
+    // 注意: onChangeイベントで処理されるため、ここでは状態更新は行わない
   };
 
   // 言語ごとの「1ワード」を構成する文字数を返す
@@ -236,7 +240,13 @@ function Game() {
 
   // スコア保存（上級クリア時のみ）
   const handleSaveScore = async () => {
-    if (!isAuthenticated || difficulty !== "advanced" || scoreSaved) return;
+    if (
+      !isAuthenticated ||
+      difficulty !== "advanced" ||
+      scoreSaved ||
+      !currentSessionId
+    )
+      return;
 
     setIsSaving(true);
     try {
@@ -249,6 +259,8 @@ function Game() {
         difficulty: "advanced",
       });
       setScoreSaved(true);
+      // セッションIDをクリアして、このセッションでは再保存できないようにする
+      setCurrentSessionId(null);
     } catch (error) {
       console.error("スコアの保存に失敗しました:", error);
     } finally {

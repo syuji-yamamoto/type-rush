@@ -24,6 +24,13 @@ class SampleTextController extends Controller
         $language = $request->query('language');
         $difficulty = $request->query('difficulty');
 
+        // 認証状態による難易度制限
+        if (in_array($difficulty, ['intermediate', 'advanced']) && !$request->user()) {
+            return response()->json([
+                'message' => '中級・上級のテキストを取得するにはログインが必要です。',
+            ], 403);
+        }
+
         $text = SampleText::getRandomByLanguageAndDifficulty($language, $difficulty);
 
         if (!$text) {
@@ -59,6 +66,13 @@ class SampleTextController extends Controller
         $language = $request->query('language');
         $difficulty = $request->query('difficulty');
         $limit = $request->query('limit', 10);
+
+        // 認証状態による難易度制限
+        if (in_array($difficulty, ['intermediate', 'advanced']) && !$request->user()) {
+            return response()->json([
+                'message' => '中級・上級のテキストを取得するにはログインが必要です。',
+            ], 403);
+        }
 
         $texts = SampleText::getRandomListByLanguageAndDifficulty($language, $difficulty, $limit);
 
