@@ -209,10 +209,23 @@ function Game() {
     }
   };
 
+  // 言語ごとの「1ワード」を構成する文字数を返す
+  // 英語: 5文字 = 1ワード（一般的なWPM定義）
+  // 日本語(ローマ字): 1語あたりの入力文字数が多くなるため、補正として大きめの値を使用
+  const getCharsPerWord = (lang: Language): number => {
+    switch (lang) {
+      case "japanese":
+        return 10;
+      default:
+        return 5;
+    }
+  };
+
   // WPM計算
   const calculateWPM = () => {
     const minutes = (60 - timeLeft) / 60 || 1;
-    return Math.round(correctChars / 5 / minutes);
+    const charsPerWord = getCharsPerWord(language);
+    return Math.round(correctChars / charsPerWord / minutes);
   };
 
   // 精度計算
