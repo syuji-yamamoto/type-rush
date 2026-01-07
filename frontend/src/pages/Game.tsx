@@ -99,10 +99,30 @@ function Game() {
 
   // 次のテキストを取得
   const getNextText = useCallback(async () => {
-    const text = await fetchRandomText();
-    setCurrentText(text);
-  }, [fetchRandomText]);
+    try {
+      const text = await fetchRandomText();
+      setCurrentText(text);
+    } catch (error) {
+      console.error("次のテキストの取得に失敗しました:", error);
 
+      // 想定外のエラー発生時もゲームが継続できるようにローカルフォールバックを使用
+      if (language === "japanese") {
+        const text =
+          fallbackJapaneseTexts[
+            Math.floor(Math.random() * fallbackJapaneseTexts.length)
+          ];
+        setCurrentJapaneseText(text);
+        setCurrentText(text.romaji);
+      } else {
+        setCurrentJapaneseText(null);
+        const text =
+          fallbackEnglishTexts[
+            Math.floor(Math.random() * fallbackEnglishTexts.length)
+          ];
+        setCurrentText(text);
+      }
+    }
+  }, [fetchRandomText, language]);
   // ゲーム開始
   const startGame = useCallback(async () => {
     setGameState("playing");
