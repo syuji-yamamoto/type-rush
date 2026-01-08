@@ -1,8 +1,16 @@
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { useAudioContext } from "../contexts/AudioContext";
 
 function Home() {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
+  const { playMenuBGM } = useAudioContext();
+
+  useEffect(() => {
+    // ページマウント時にメニューBGMを再生
+    playMenuBGM();
+  }, [playMenuBGM]);
 
   const handleLogout = async () => {
     try {

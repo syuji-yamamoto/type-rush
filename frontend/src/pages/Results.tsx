@@ -45,7 +45,6 @@ function Results() {
 
     fetchData();
   }, [isAuthenticated, authLoading, navigate]);
-
   // 認証確認中
   if (authLoading || isLoading) {
     return (
