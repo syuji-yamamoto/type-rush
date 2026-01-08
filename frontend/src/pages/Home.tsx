@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useAudioContext } from "../contexts/AudioContext";
+import { AudioControl } from "../components/AudioControl";
 
 function Home() {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
@@ -22,6 +23,11 @@ function Home() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      {/* 音量コントロール */}
+      <div className="absolute top-4 right-4">
+        <AudioControl />
+      </div>
+
       <div className="text-center">
         {/* ログイン中のユーザー表示 */}
         {isAuthenticated && user && (

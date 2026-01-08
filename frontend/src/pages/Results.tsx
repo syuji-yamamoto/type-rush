@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { AudioControl } from "../components/AudioControl";
 import {
   getScoreStats,
   getScoreHistory,
@@ -112,10 +113,11 @@ function Results() {
   return (
     <div className="min-h-screen p-4">
       {/* ヘッダー */}
-      <div className="mb-8">
+      <div className="flex justify-between items-center mb-8">
         <Link to="/" className="text-gray-300 hover:text-white">
           ← ホームに戻る
         </Link>
+        <AudioControl />
       </div>
 
       <div className="max-w-4xl mx-auto">
