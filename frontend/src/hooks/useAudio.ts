@@ -25,27 +25,24 @@ export const useAudio = (): UseAudioReturn => {
   const [config, setConfig] = useState<{
     bgm: AudioConfig;
     se: AudioConfig;
-  }>({
-    bgm: { volume: 0.5, enabled: true },
-    se: { volume: 0.5, enabled: true },
-  });
-
-  // BGMとSEで共通の音量設定を使用
-  const commonVolume = config.bgm.volume;
-
-  useEffect(() => {
-    // ローカルストレージから設定を読み込み
+  }>(() => {
+    // 初期化時にlocalStorageから設定を読み込み
     const savedConfig = localStorage.getItem("audioConfig");
     if (savedConfig) {
       try {
-        const parsed = JSON.parse(savedConfig);
-        setConfig(parsed);
+        return JSON.parse(savedConfig);
       } catch (error) {
         console.error("Failed to parse audio config:", error);
       }
     }
-  }, []);
+    return {
+      bgm: { volume: 0.5, enabled: true },
+      se: { volume: 0.5, enabled: true },
+    };
+  });
 
+  // BGMとSEで共通の音量設定を使用
+  const commonVolume = config.bgm.volume;
   useEffect(() => {
     // 設定をローカルストレージに保存
     localStorage.setItem("audioConfig", JSON.stringify(config));
