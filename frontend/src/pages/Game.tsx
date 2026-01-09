@@ -202,7 +202,6 @@ function Game() {
 
       if (addedChar === expectedChar) {
         setCorrectChars((prev) => prev + 1);
-        // 正解時のSE再生（1文字ごとではなく単語完成時のみ）
       } else {
         // 不正解時のSE再生
         playIncorrectSE();
