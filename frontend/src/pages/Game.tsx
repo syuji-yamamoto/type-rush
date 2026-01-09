@@ -33,6 +33,7 @@ const fallbackEnglishTexts = [
 function Game() {
   const { isAuthenticated } = useAuth();
   const {
+    playMenuBGM,
     playGameBGM,
     playCorrectSE,
     playIncorrectSE,
@@ -66,6 +67,17 @@ function Game() {
     }
     return ["beginner"];
   };
+
+  useEffect(() => {
+    // ページマウント時にメニューBGMを再生（マウント時のみ実行）
+    playMenuBGM();
+
+    // コンポーネントのアンマウント時にBGMを停止
+    return () => {
+      stopBGM();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // APIからテキストを取得
   const fetchRandomText = useCallback(async (): Promise<string> => {

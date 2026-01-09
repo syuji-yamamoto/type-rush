@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useAudioContext } from "../contexts/AudioContext";
 import { AudioControl } from "../components/AudioControl";
 import {
   getScoreStats,
@@ -11,11 +12,22 @@ import {
 
 function Results() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { playMenuBGM, stopBGM } = useAudioContext();
   const navigate = useNavigate();
   const [stats, setStats] = useState<ScoreStats | null>(null);
   const [scores, setScores] = useState<Score[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // BGMの再生を開始
+    playMenuBGM();
+
+    return () => {
+      stopBGM();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     // 認証チェック

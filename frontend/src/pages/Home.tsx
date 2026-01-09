@@ -9,14 +9,15 @@ function Home() {
   const { playMenuBGM, stopBGM } = useAudioContext();
 
   useEffect(() => {
-    // ページマウント時にメニューBGMを再生
+    // ページマウント時にメニューBGMを再生（マウント時のみ実行）
     playMenuBGM();
 
     // コンポーネントのアンマウント時にBGMを停止
     return () => {
       stopBGM();
     };
-  }, [playMenuBGM, stopBGM]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const handleLogout = async () => {
     try {
       await logout();

@@ -21,6 +21,8 @@ interface UseAudioReturn {
 export const useAudio = (): UseAudioReturn => {
   const bgmRef = useRef<HTMLAudioElement | null>(null);
   const seRefs = useRef<HTMLAudioElement[]>([]);
+  const lastBgmSrcRef = useRef<string | null>(null);
+  const lastBgmLoopRef = useRef<boolean>(false);
 
   const [config, setConfig] = useState<{
     bgm: AudioConfig;
@@ -43,6 +45,20 @@ export const useAudio = (): UseAudioReturn => {
 
   // BGMとSEで共通の音量設定を使用
   const commonVolume = config.bgm.volume;
+
+  // クリーンアップ処理：コンポーネントのアンマウント時に音声リソースを解放
+  useEffect(() => {
+    return () => {
+      // クリーンアップ処理
+      if (bgmRef.current) {
+        bgmRef.current.pause();
+        bgmRef.current = null;
+      }
+      seRefs.current.forEach((audio) => audio.pause());
+      seRefs.current = [];
+    };
+  }, []);
+
   useEffect(() => {
     // 設定をローカルストレージに保存
     localStorage.setItem("audioConfig", JSON.stringify(config));
@@ -54,6 +70,15 @@ export const useAudio = (): UseAudioReturn => {
 
       if (type === "bgm") {
         // BGM再生
+        // 既に同じBGMが再生中の場合は何もしない
+        if (
+          bgmRef.current &&
+          lastBgmSrcRef.current === src &&
+          !bgmRef.current.paused
+        ) {
+          return;
+        }
+
         if (bgmRef.current) {
           bgmRef.current.pause();
           bgmRef.current = null;
@@ -68,6 +93,9 @@ export const useAudio = (): UseAudioReturn => {
         });
 
         bgmRef.current = audio;
+        // 最後に再生したBGMの情報を保存
+        lastBgmSrcRef.current = src;
+        lastBgmLoopRef.current = loop;
       } else {
         // SE再生（複数同時再生可能）
         const audio = new Audio(src);
@@ -77,10 +105,12 @@ export const useAudio = (): UseAudioReturn => {
           console.error("Failed to play SE:", error);
         });
 
-        // 再生完了後に参照を削除
-        audio.addEventListener("ended", () => {
+        // 再生完了後に参照を削除（イベントリスナーのクリーンアップも含む）
+        const handleEnded = () => {
           seRefs.current = seRefs.current.filter((ref) => ref !== audio);
-        });
+          audio.removeEventListener("ended", handleEnded);
+        };
+        audio.addEventListener("ended", handleEnded);
 
         seRefs.current.push(audio);
       }
@@ -99,6 +129,8 @@ export const useAudio = (): UseAudioReturn => {
     if (!type || type === "se") {
       seRefs.current.forEach((audio) => {
         audio.pause();
+        // イベントリスナーもクリーンアップ
+        audio.removeEventListener("ended", audio.onended as EventListener);
       });
       seRefs.current = [];
     }
@@ -122,18 +154,39 @@ export const useAudio = (): UseAudioReturn => {
     });
   }, []);
 
-  const setEnabled = useCallback((type: AudioType, enabled: boolean) => {
-    setConfig((prev) => ({
-      ...prev,
-      [type]: { ...prev[type], enabled },
-    }));
+  const setEnabled = useCallback(
+    (type: AudioType, enabled: boolean) => {
+      setConfig((prev) => ({
+        ...prev,
+        [type]: { ...prev[type], enabled },
+      }));
 
-    // BGMが無効化された場合は停止
-    if (type === "bgm" && !enabled && bgmRef.current) {
-      bgmRef.current.pause();
-      bgmRef.current = null;
-    }
-  }, []);
+      // BGMが無効化された場合は停止
+      if (type === "bgm" && !enabled && bgmRef.current) {
+        bgmRef.current.pause();
+        bgmRef.current = null;
+      }
+
+      // BGMが有効化された場合、前回再生していた音楽があれば再開
+      if (
+        type === "bgm" &&
+        enabled &&
+        lastBgmSrcRef.current &&
+        !bgmRef.current
+      ) {
+        const audio = new Audio(lastBgmSrcRef.current);
+        audio.loop = lastBgmLoopRef.current;
+        audio.volume = commonVolume;
+
+        audio.play().catch((error) => {
+          console.error("Failed to resume BGM:", error);
+        });
+
+        bgmRef.current = audio;
+      }
+    },
+    [commonVolume]
+  );
 
   return {
     play,
