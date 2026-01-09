@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useAudioContext } from "../contexts/AudioContext";
+import { AudioControl } from "../components/AudioControl";
 import {
   getScoreStats,
   getScoreHistory,
@@ -10,11 +12,22 @@ import {
 
 function Results() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { playMenuBGM, stopBGM } = useAudioContext();
   const navigate = useNavigate();
   const [stats, setStats] = useState<ScoreStats | null>(null);
   const [scores, setScores] = useState<Score[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // BGMの再生を開始
+    playMenuBGM();
+
+    return () => {
+      stopBGM();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     // 認証チェック
@@ -45,7 +58,6 @@ function Results() {
 
     fetchData();
   }, [isAuthenticated, authLoading, navigate]);
-
   // 認証確認中
   if (authLoading || isLoading) {
     return (
@@ -113,10 +125,11 @@ function Results() {
   return (
     <div className="min-h-screen p-4">
       {/* ヘッダー */}
-      <div className="mb-8">
+      <div className="flex justify-between items-center mb-8">
         <Link to="/" className="text-gray-300 hover:text-white">
           ← ホームに戻る
         </Link>
+        <AudioControl />
       </div>
 
       <div className="max-w-4xl mx-auto">

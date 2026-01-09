@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useAudioContext } from "../contexts/AudioContext";
+import { AudioControl } from "../components/AudioControl";
 import { AxiosError } from "axios";
 import { ApiError } from "../types/interfaces";
 
@@ -12,7 +14,18 @@ function Register() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { register } = useAuth();
+  const { playMenuBGM, stopBGM } = useAudioContext();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // ページマウント時にメニューBGMを再生
+    playMenuBGM();
+
+    return () => {
+      stopBGM();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,6 +58,11 @@ function Register() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      {/* 音量コントロール */}
+      <div className="absolute top-4 right-4">
+        <AudioControl />
+      </div>
+
       <div className="w-full max-w-md">
         <h1 className="text-3xl font-bold text-white text-center mb-8">
           新規登録

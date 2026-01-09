@@ -1,9 +1,23 @@
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { useAudioContext } from "../contexts/AudioContext";
+import { AudioControl } from "../components/AudioControl";
 
 function Home() {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
+  const { playMenuBGM, stopBGM } = useAudioContext();
 
+  useEffect(() => {
+    // ページマウント時にメニューBGMを再生（マウント時のみ実行）
+    playMenuBGM();
+
+    // コンポーネントのアンマウント時にBGMを停止
+    return () => {
+      stopBGM();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const handleLogout = async () => {
     try {
       await logout();
@@ -14,6 +28,11 @@ function Home() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      {/* 音量コントロール */}
+      <div className="absolute top-4 right-4">
+        <AudioControl />
+      </div>
+
       <div className="text-center">
         {/* ログイン中のユーザー表示 */}
         {isAuthenticated && user && (

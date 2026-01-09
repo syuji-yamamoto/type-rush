@@ -8,6 +8,8 @@ import {
 } from "../api/sampleText";
 import { saveScore } from "../api/score";
 import { useAuth } from "../contexts/AuthContext";
+import { useAudioContext } from "../contexts/AudioContext";
+import { AudioControl } from "../components/AudioControl";
 
 // フォールバック用のローカルテキスト（API障害時用）
 const fallbackJapaneseTexts: JapaneseText[] = [
@@ -30,10 +32,18 @@ const fallbackEnglishTexts = [
 
 function Game() {
   const { isAuthenticated } = useAuth();
+  const {
+    playMenuBGM,
+    playGameBGM,
+    playCorrectSE,
+    playIncorrectSE,
+    stopBGM,
+    playResultBGM,
+  } = useAudioContext();
   const [gameState, setGameState] = useState<"ready" | "playing" | "finished">(
     "ready"
   );
-  const [language, setLanguage] = useState<Language>("english");
+  const [language, setLanguage] = useState<Language>("japanese");
   const [difficulty, setDifficulty] = useState<Difficulty>("beginner");
   const [currentText, setCurrentText] = useState("");
   const [currentJapaneseText, setCurrentJapaneseText] =
@@ -43,8 +53,6 @@ function Game() {
   const [correctChars, setCorrectChars] = useState(0);
   const [totalChars, setTotalChars] = useState(0);
   const [wordsCompleted, setWordsCompleted] = useState(0);
-  const [volume, setVolume] = useState(50);
-  const [isMuted, setIsMuted] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -59,6 +67,17 @@ function Game() {
     }
     return ["beginner"];
   };
+
+  useEffect(() => {
+    // ページマウント時にメニューBGMを再生（マウント時のみ実行）
+    playMenuBGM();
+
+    // コンポーネントのアンマウント時にBGMを停止
+    return () => {
+      stopBGM();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // APIからテキストを取得
   const fetchRandomText = useCallback(async (): Promise<string> => {
@@ -134,9 +153,13 @@ function Game() {
     setWordsCompleted(0);
     setScoreSaved(false);
     setCurrentSessionId(`${Date.now()}-${Math.random()}`);
+
+    // 難易度に応じたBGMを再生
+    playGameBGM(difficulty);
+
     await getNextText();
     inputRef.current?.focus();
-  }, [getNextText]);
+  }, [getNextText, playGameBGM, difficulty]);
 
   // タイマー
   useEffect(() => {
@@ -146,6 +169,8 @@ function Game() {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           setGameState("finished");
+          stopBGM(); // ゲーム終了時にBGMを停止
+          playResultBGM(); // 結果BGMを再生
           return 0;
         }
         return prev - 1;
@@ -153,7 +178,7 @@ function Game() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [gameState]);
+  }, [gameState, stopBGM, playResultBGM]);
 
   // 難易度表示用のラベル
   const getDifficultyLabel = (diff: Difficulty): string => {
@@ -189,6 +214,9 @@ function Game() {
 
       if (addedChar === expectedChar) {
         setCorrectChars((prev) => prev + 1);
+      } else {
+        // 不正解時のSE再生
+        playIncorrectSE();
       }
     }
 
@@ -196,6 +224,8 @@ function Game() {
     if (value === currentText) {
       setWordsCompleted((prev) => prev + 1);
       setUserInput("");
+      // 単語完成時の正解SE
+      playCorrectSE();
       await getNextText();
     }
   };
@@ -278,22 +308,8 @@ function Game() {
       </div>
 
       {/* 音量コントロール */}
-      <div className="absolute top-4 right-4 flex items-center gap-2">
-        <button
-          onClick={() => setIsMuted(!isMuted)}
-          className="text-gray-300 hover:text-white"
-        >
-          {isMuted ? "🔇" : "🔊"}
-        </button>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={volume}
-          onChange={(e) => setVolume(Number(e.target.value))}
-          className="w-24"
-          disabled={isMuted}
-        />
+      <div className="absolute top-4 right-4">
+        <AudioControl />
       </div>
 
       {/* ゲーム画面 */}
@@ -307,16 +323,6 @@ function Game() {
               <p className="text-gray-300 mb-4">言語を選択:</p>
               <div className="flex justify-center gap-4">
                 <button
-                  onClick={() => setLanguage("english")}
-                  className={`px-6 py-3 rounded-lg font-bold transition-all ${
-                    language === "english"
-                      ? "bg-cyan-500 text-white"
-                      : "bg-gray-600 text-gray-300 hover:bg-gray-500"
-                  }`}
-                >
-                  English
-                </button>
-                <button
                   onClick={() => setLanguage("japanese")}
                   className={`px-6 py-3 rounded-lg font-bold transition-all ${
                     language === "japanese"
@@ -325,6 +331,16 @@ function Game() {
                   }`}
                 >
                   日本語
+                </button>
+                <button
+                  onClick={() => setLanguage("english")}
+                  className={`px-6 py-3 rounded-lg font-bold transition-all ${
+                    language === "english"
+                      ? "bg-cyan-500 text-white"
+                      : "bg-gray-600 text-gray-300 hover:bg-gray-500"
+                  }`}
+                >
+                  English
                 </button>
               </div>
             </div>
