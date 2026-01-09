@@ -6,13 +6,17 @@ import { AudioControl } from "../components/AudioControl";
 
 function Home() {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
-  const { playMenuBGM } = useAudioContext();
+  const { playMenuBGM, stopBGM } = useAudioContext();
 
   useEffect(() => {
     // ページマウント時にメニューBGMを再生
     playMenuBGM();
-  }, [playMenuBGM]);
 
+    // コンポーネントのアンマウント時にBGMを停止
+    return () => {
+      stopBGM();
+    };
+  }, [playMenuBGM, stopBGM]);
   const handleLogout = async () => {
     try {
       await logout();
