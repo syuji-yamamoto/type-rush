@@ -1,5 +1,5 @@
 import React, { createContext, useContext, ReactNode } from "react";
-import { useAudio, AudioType } from "../hooks/useAudio";
+import { useAudio } from "../hooks/useAudio";
 
 // 音源パスの定数定義
 export const AUDIO_PATHS = {
