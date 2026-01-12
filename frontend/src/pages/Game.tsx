@@ -58,6 +58,7 @@ function Game() {
   const [isSaving, setIsSaving] = useState(false);
   const [scoreSaved, setScoreSaved] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+  const [imeWarning, setImeWarning] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // 利用可能な難易度を取得
@@ -158,7 +159,10 @@ function Game() {
     playGameBGM(difficulty);
 
     await getNextText();
-    inputRef.current?.focus();
+    // setTimeoutを使用して、レンダリング後に確実にフォーカスを当てる
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
   }, [getNextText, playGameBGM, difficulty]);
 
   // タイマー
@@ -196,49 +200,69 @@ function Game() {
 
   // 入力処理
   const handleInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (gameState !== "playing" || isComposing) return;
+    // IME入力中はonChangeイベントが発火しないため、isComposingチェックは不要
+    // （ただしgameStateのチェックは必要）
+    if (gameState !== "playing") return;
 
     const value = e.target.value.toLowerCase();
     const prevLength = userInput.length;
     const newLength = value.length;
 
-    setUserInput(value);
-
     // 文字が追加された場合のみ処理（削除時は無視）
     if (newLength > prevLength) {
       // 追加された文字の正誤判定
-      const addedChar = value[newLength - 1];
-      const expectedChar = currentText[newLength - 1];
+      const addedChar = value[newLength - 1]; // ユーザーが追加した文字
+      const expectedChar = currentText[newLength - 1]; // 期待される文字
 
       setTotalChars((prev) => prev + 1);
 
       if (addedChar === expectedChar) {
+        // 正解の場合のみ入力を受け付ける
         setCorrectChars((prev) => prev + 1);
+        setUserInput(value);
+        // 正常に入力できているので、IME警告を消す
+        if (imeWarning) {
+          setImeWarning(false);
+        }
+
+        // 正解チェック（全文完成したか）
+        if (value === currentText) {
+          setWordsCompleted((prev) => prev + 1);
+          setUserInput("");
+          // 単語完成時の正解SE
+          playCorrectSE();
+          await getNextText();
+          // テキスト完了後、inputフィールドに自動フォーカスを戻す
+          setTimeout(() => {
+            inputRef.current?.focus();
+          }, 0);
+        }
       } else {
-        // 不正解時のSE再生
+        // 不正解の場合は入力を受け付けず、SEのみ再生
         playIncorrectSE();
       }
-    }
-
-    // 正解チェック
-    if (value === currentText) {
-      setWordsCompleted((prev) => prev + 1);
-      setUserInput("");
-      // 単語完成時の正解SE
-      playCorrectSE();
-      await getNextText();
+    } else if (newLength < prevLength) {
+      // 削除時は入力を受け付ける
+      setUserInput(value);
     }
   };
 
   // IME入力の開始・終了を検知
   const handleCompositionStart = () => {
     setIsComposing(true);
+    // 全角入力の警告を表示
+    setImeWarning(true);
   };
 
   const handleCompositionEnd = async (
     _e: React.CompositionEvent<HTMLInputElement>
   ) => {
-    setIsComposing(false);
+    // setTimeoutを使用して、onChangeイベントの後に確実に状態をリセット
+    setTimeout(() => {
+      setIsComposing(false);
+      // 警告を非表示
+      setImeWarning(false);
+    }, 0);
     // IME確定後の入力処理
     // 注意: onChangeイベントで処理されるため、ここでは状態更新は行わない
   };
@@ -482,6 +506,13 @@ function Game() {
                 </>
               )}
             </div>
+
+            {/* IME警告 */}
+            {imeWarning && (
+              <div className="mb-2 p-3 bg-yellow-900/50 border border-yellow-500 rounded-lg text-yellow-300 text-sm">
+                ⚠️ 全角入力モードになっています。半角英数字で入力してください。
+              </div>
+            )}
 
             {/* 入力フィールド */}
             <input
