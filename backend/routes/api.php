@@ -7,8 +7,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // 認証不要のルート
-Route::post('/test', function (Request $request) {
-    return response()->json(['message' => 'API is working!']);
+
+// ヘルスチェックエンドポイント
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'ok',
+        'timestamp' => now()->toIso8601String(),
+        'service' => 'type-rush-api'
+    ]);
 });
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);

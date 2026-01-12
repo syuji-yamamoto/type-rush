@@ -88,6 +88,21 @@ jobs:
 
       - name: Health check
         run: |
-          sleep 10
-          curl -f https://api.type-rush.com/api/health || exit 1
-          echo "✅ Health check passed!"
+          echo "⏳ Waiting for server to restart..."
+          sleep 15
+
+          echo "🔍 Testing health endpoint..."
+          RESPONSE=$(curl -s -w "\n%{http_code}" https://api.type-rush.com/api/health)
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | head -n-1)
+
+          echo "HTTP Status: $HTTP_CODE"
+          echo "Response Body: $BODY"
+
+          if [ "$HTTP_CODE" -eq 200 ]; then
+            echo "✅ Health check passed!"
+            exit 0
+          else
+            echo "❌ Health check failed with status $HTTP_CODE"
+            exit 1
+          fi
