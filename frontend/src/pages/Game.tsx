@@ -220,6 +220,10 @@ function Game() {
         // 正解の場合のみ入力を受け付ける
         setCorrectChars((prev) => prev + 1);
         setUserInput(value);
+        // 正常に入力できているので、IME警告を消す
+        if (imeWarning) {
+          setImeWarning(false);
+        }
 
         // 正解チェック（全文完成したか）
         if (value === currentText) {
