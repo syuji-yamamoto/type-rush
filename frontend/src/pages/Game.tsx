@@ -53,7 +53,6 @@ function Game() {
   const [correctChars, setCorrectChars] = useState(0);
   const [totalChars, setTotalChars] = useState(0);
   const [wordsCompleted, setWordsCompleted] = useState(0);
-  const [isComposing, setIsComposing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [scoreSaved, setScoreSaved] = useState(false);
@@ -249,7 +248,6 @@ function Game() {
 
   // IME入力の開始・終了を検知
   const handleCompositionStart = () => {
-    setIsComposing(true);
     // 全角入力の警告を表示
     setImeWarning(true);
   };
@@ -259,7 +257,6 @@ function Game() {
   ) => {
     // setTimeoutを使用して、onChangeイベントの後に確実に状態をリセット
     setTimeout(() => {
-      setIsComposing(false);
       // 警告を非表示
       setImeWarning(false);
     }, 0);
