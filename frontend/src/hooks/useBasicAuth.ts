@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 
 const AUTH_KEY = "basic_auth_timestamp";
-const AUTH_DURATION = 60 * 60 * 1000; // 1時間（ミリ秒）
 const AUTH_CHECK_INTERVAL = 60 * 1000; // 1分（ミリ秒）
+const AUTH_DURATION = 60 * AUTH_CHECK_INTERVAL; // 1時間（ミリ秒）
 const CORRECT_USERNAME = "admin";
 const CORRECT_PASSWORD = "type-rush";
 
