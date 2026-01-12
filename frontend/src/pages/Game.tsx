@@ -236,7 +236,7 @@ function Game() {
   };
 
   const handleCompositionEnd = async (
-    e: React.CompositionEvent<HTMLInputElement>
+    _e: React.CompositionEvent<HTMLInputElement>
   ) => {
     setIsComposing(false);
     // IME確定後の入力処理

@@ -1,0 +1,76 @@
+name: Deploy Backend to Lightsail
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "type-rush/backend/**"
+  workflow_dispatch: # 手動実行用
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: mbstring, xml, ctype, json, curl, pdo_mysql, zip
+          coverage: none
+
+      - name: Install Composer dependencies
+        working-directory: type-rush/backend
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run tests
+        working-directory: type-rush/backend
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          php artisan test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Lightsail via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.LIGHTSAIL_HOST }}
+          username: ${{ secrets.LIGHTSAIL_USERNAME }}
+          key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
+          script: |
+            cd /opt/bitnami/apache/htdocs/type-rush
+
+            # 最新のコードを取得
+            git pull origin main
+
+            cd backend
+
+            # Composer依存関係を更新
+            composer install --no-dev --optimize-autoloader
+
+            # マイグレーション実行
+            php artisan migrate --force
+
+            # キャッシュをクリアして再生成
+            php artisan cache:clear
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+
+            # Apacheを再起動
+            sudo /opt/bitnami/ctlscript.sh restart apache
+
+            echo "✅ Backend deployed successfully!"
+
+      - name: Health check
+        run: |
+          sleep 10
+          curl -f https://api.type-rush.com/api/health || exit 1
+          echo "✅ Health check passed!"
