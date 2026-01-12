@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\HealthController;
 use App\Http\Controllers\SampleTextController;
 use App\Http\Controllers\ScoreController;
 use Illuminate\Http\Request;
@@ -9,13 +10,8 @@ use Illuminate\Support\Facades\Route;
 // 認証不要のルート
 
 // ヘルスチェックエンドポイント
-Route::get('/health', function () {
-    return response()->json([
-        'status' => 'ok',
-        'timestamp' => now()->toIso8601String(),
-        'service' => 'type-rush-api'
-    ]);
-});
+Route::get('/health', [HealthController::class, 'check']);
+
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
