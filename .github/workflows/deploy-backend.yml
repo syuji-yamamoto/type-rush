@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "type-rush/backend/**"
+      - "backend/**"
   workflow_dispatch: # 手動実行用
 
 jobs:
@@ -23,11 +23,11 @@ jobs:
           coverage: none
 
       - name: Install Composer dependencies
-        working-directory: type-rush/backend
+        working-directory: backend
         run: composer install --prefer-dist --no-progress
 
       - name: Run tests
-        working-directory: type-rush/backend
+        working-directory: backend
         run: |
           cp .env.example .env
           php artisan key:generate
