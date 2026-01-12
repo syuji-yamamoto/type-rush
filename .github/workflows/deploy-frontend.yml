@@ -18,6 +18,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Validate required secrets
+        run: |
+          if [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ]; then
+            echo "❌ Error: AWS_ACCESS_KEY_ID is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ]; then
+            echo "❌ Error: AWS_SECRET_ACCESS_KEY is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.S3_BUCKET }}" ]; then
+            echo "❌ Error: S3_BUCKET is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" ]; then
+            echo "❌ Error: CLOUDFRONT_DISTRIBUTION_ID is not set"
+            exit 1
+          fi
+          echo "✅ All required secrets are configured"
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:

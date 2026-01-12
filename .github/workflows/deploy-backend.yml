@@ -38,6 +38,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Validate required secrets
+        run: |
+          if [ -z "${{ secrets.LIGHTSAIL_HOST }}" ]; then
+            echo "❌ Error: LIGHTSAIL_HOST is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.LIGHTSAIL_USERNAME }}" ]; then
+            echo "❌ Error: LIGHTSAIL_USERNAME is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.LIGHTSAIL_SSH_KEY }}" ]; then
+            echo "❌ Error: LIGHTSAIL_SSH_KEY is not set"
+            exit 1
+          fi
+          echo "✅ All required secrets are configured"
+
       - name: Deploy to Lightsail via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
