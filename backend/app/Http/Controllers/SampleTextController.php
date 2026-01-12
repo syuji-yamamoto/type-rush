@@ -25,7 +25,9 @@ class SampleTextController extends Controller
         $difficulty = $request->query('difficulty');
 
         // 認証状態による難易度制限
-        if (in_array($difficulty, ['intermediate', 'advanced']) && !$request->user()) {
+        // Bearerトークンの存在をチェック（auth:sanctumミドルウェア経由でなくても動作）
+        $hasAuth = $request->bearerToken() !== null;
+        if (in_array($difficulty, ['intermediate', 'advanced']) && !$hasAuth) {
             return response()->json([
                 'message' => '中級・上級のテキストを取得するにはログインが必要です。',
             ], 403);
@@ -68,7 +70,9 @@ class SampleTextController extends Controller
         $limit = $request->query('limit', 10);
 
         // 認証状態による難易度制限
-        if (in_array($difficulty, ['intermediate', 'advanced']) && !$request->user()) {
+        // Bearerトークンの存在をチェック（auth:sanctumミドルウェア経由でなくても動作）
+        $hasAuth = $request->bearerToken() !== null;
+        if (in_array($difficulty, ['intermediate', 'advanced']) && !$hasAuth) {
             return response()->json([
                 'message' => '中級・上級のテキストを取得するにはログインが必要です。',
             ], 403);
