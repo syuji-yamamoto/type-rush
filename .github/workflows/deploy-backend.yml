@@ -36,6 +36,7 @@ jobs:
   deploy:
     needs: test
     runs-on: ubuntu-latest
+    environment: type-rush-aws
 
     steps:
       - name: Validate required secrets
