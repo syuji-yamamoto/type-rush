@@ -208,35 +208,38 @@ function Game() {
     const prevLength = userInput.length;
     const newLength = value.length;
 
-    setUserInput(value);
-
     // 文字が追加された場合のみ処理（削除時は無視）
     if (newLength > prevLength) {
       // 追加された文字の正誤判定
-      const addedChar = value[newLength - 1];
-      const expectedChar = currentText[newLength - 1];
+      const addedChar = value[newLength - 1]; // ユーザーが追加した文字
+      const expectedChar = currentText[newLength - 1]; // 期待される文字
 
       setTotalChars((prev) => prev + 1);
 
       if (addedChar === expectedChar) {
+        // 正解の場合のみ入力を受け付ける
         setCorrectChars((prev) => prev + 1);
+        setUserInput(value);
+
+        // 正解チェック（全文完成したか）
+        if (value === currentText) {
+          setWordsCompleted((prev) => prev + 1);
+          setUserInput("");
+          // 単語完成時の正解SE
+          playCorrectSE();
+          await getNextText();
+          // テキスト完了後、inputフィールドに自動フォーカスを戻す
+          setTimeout(() => {
+            inputRef.current?.focus();
+          }, 0);
+        }
       } else {
-        // 不正解時のSE再生
+        // 不正解の場合は入力を受け付けず、SEのみ再生
         playIncorrectSE();
       }
-    }
-
-    // 正解チェック
-    if (value === currentText) {
-      setWordsCompleted((prev) => prev + 1);
-      setUserInput("");
-      // 単語完成時の正解SE
-      playCorrectSE();
-      await getNextText();
-      // テキスト完了後、inputフィールドに自動フォーカスを戻す
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 0);
+    } else if (newLength < prevLength) {
+      // 削除時は入力を受け付ける
+      setUserInput(value);
     }
   };
 
