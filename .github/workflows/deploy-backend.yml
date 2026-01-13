@@ -64,27 +64,40 @@ jobs:
           script: |
             cd /opt/bitnami/apache/htdocs/type-rush
 
-            # 最新のコードを取得
-            git pull origin main
+            # Git所有権の問題を解決
+            git config --global --add safe.directory /opt/bitnami/apache/htdocs/type-rush
+
+            # 最新のコードを取得（エラーチェック付き）
+            echo "📥 Pulling latest code..."
+            if ! git pull origin main; then
+              echo "❌ Git pull failed"
+              exit 1
+            fi
 
             cd backend
 
+            # ストレージとキャッシュディレクトリのパーミッション修正
+            echo "🔧 Fixing permissions..."
+            sudo chown -R bitnami:daemon storage bootstrap/cache
+            sudo chmod -R 775 storage bootstrap/cache
+
             # Composer依存関係を更新
+            echo "📦 Installing dependencies..."
             composer install --no-dev --optimize-autoloader
 
             # マイグレーション実行
+            echo "🔄 Running migrations..."
             php artisan migrate --force
 
-            # シーダー実行
-            php artisan db:seed --force
-
             # キャッシュをクリアして再生成
+            echo "🧹 Clearing and regenerating cache..."
             php artisan cache:clear
             php artisan config:cache
             php artisan route:clear
             php artisan view:cache
 
             # Apacheを再起動
+            echo "🔄 Restarting Apache..."
             sudo /opt/bitnami/ctlscript.sh restart apache
 
             echo "✅ Backend deployed successfully!"
