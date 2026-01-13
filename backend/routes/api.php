@@ -7,11 +7,9 @@ use App\Http\Controllers\ScoreController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// 認証不要のルート
-// テスト用に /api/health エンドポイントを追加
 // ヘルスチェックエンドポイント
 Route::get('/health', [HealthController::class, 'check']);
-
+// 認証不要のルート
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
