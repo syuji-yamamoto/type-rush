@@ -64,6 +64,8 @@ jobs:
           script: |
             cd /opt/bitnami/apache/htdocs/type-rush
 
+            # ディレクトリの所有権を変更
+            sudo chown -R bitnami:daemon /opt/bitnami/apache/htdocs/type-rush
             # 最新のコードを取得
             git pull origin main
 
