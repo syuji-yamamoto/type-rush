@@ -75,6 +75,9 @@ jobs:
             # マイグレーション実行
             php artisan migrate --force
 
+            # シーダー実行
+            php artisan db:seed --force
+
             # キャッシュをクリアして再生成
             php artisan cache:clear
             php artisan config:cache

@@ -12,6 +12,12 @@ class ScoreSeeder extends Seeder
      */
     public function run(): void
     {
+        // 本番環境ではシーダーを実行しない
+        // if (app()->environment('production')) {
+        //     $this->command->warn('⚠️ Seeder is disabled in production environment.');
+        //     return;
+        // }
+
         $scores = [
             [
                 'user_id' => 1,
