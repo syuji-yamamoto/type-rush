@@ -64,6 +64,10 @@ jobs:
           script: |
             cd /opt/bitnami/apache/htdocs/type-rush
 
+            # Gitディレクトリのパーミッション修正
+            echo "🔧 Fixing Git permissions..."
+            sudo chown -R bitnami:bitnami .git
+
             # Git所有権の問題を解決
             git config --global --add safe.directory /opt/bitnami/apache/htdocs/type-rush
 
