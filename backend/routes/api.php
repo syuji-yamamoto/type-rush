@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // 認証不要のルート
-
+// テスト用に /api/health エンドポイントを追加
 // ヘルスチェックエンドポイント
 Route::get('/health', [HealthController::class, 'check']);
 
