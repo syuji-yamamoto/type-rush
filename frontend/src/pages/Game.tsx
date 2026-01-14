@@ -444,40 +444,24 @@ function Game() {
                   {language === "japanese" && currentJapaneseText && (
                     <div className="mb-4">
                       <p className="text-3xl text-white mb-2 leading-relaxed">
-                        {currentJapaneseText.display
-                          .split("")
-                          .map((char, index) => {
-                            // 入力状態に基づく色分け
-                            let rubyClassName = "text-gray-400 text-sm";
-
-                            // 簡易的な進捗計算（入力の進行度合い）
-                            const progress =
-                              userInput.length / currentText.length;
-                            const charProgress =
-                              index / currentJapaneseText.display.length;
-
-                            if (charProgress < progress) {
-                              // 入力済みの部分
-                              const isCorrect =
-                                currentText.startsWith(userInput);
-                              rubyClassName = isCorrect
-                                ? "text-green-400 text-sm font-bold"
-                                : "text-red-400 text-sm font-bold";
-                            }
-
-                            return (
-                              <ruby key={index}>
-                                {char}
-                                <rt className={rubyClassName}>
-                                  {currentJapaneseText.reading[index] || ""}
-                                </rt>
-                              </ruby>
-                            );
-                          })}
+                        <ruby>
+                          {currentJapaneseText.display
+                            .split("")
+                            .map((char, index) => {
+                              return (
+                                <span
+                                  key={index}
+                                  className="text-4xl font-bold"
+                                >
+                                  {char}
+                                </span>
+                              );
+                            })}
+                          <rt className="text-gray-400 text-xl font-bold">
+                            {currentJapaneseText.reading}
+                          </rt>
+                        </ruby>
                       </p>
-                      <div className="text-xs text-gray-500 mt-2">
-                        ローマ字入力: {currentJapaneseText.romaji}
-                      </div>
                     </div>
                   )}
 
