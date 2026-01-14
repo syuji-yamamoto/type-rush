@@ -1,12 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import type { JapaneseText } from "../types/types";
-import {
-  type Difficulty,
-  type Language,
-  fetchRandomTextWithFallback,
-  getFallbackText,
-} from "../api/sampleText";
-import { saveScore } from "../api/score";
+import { useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useAudioContext } from "../contexts/AudioContext";
 import { GameHeader } from "../components/game/GameHeader";
@@ -15,354 +7,145 @@ import { GameStats } from "../components/game/GameStats";
 import { TypingArea } from "../components/game/TypingArea";
 import { IMEWarning } from "../components/game/IMEWarning";
 import { GameResult } from "../components/game/GameResult";
+import { useGameLogic } from "../hooks/useGameLogic";
+import { useScoreSave } from "../hooks/useScoreSave";
+import {
+  getDifficultyLabel,
+  calculateWPM,
+  calculateAccuracy,
+  getAvailableDifficulties,
+} from "../utils/gameUtils";
 
-// ゲーム設定の定数
-const GAME_DURATION_SECONDS = 60; // ゲーム時間（秒）
-const TIMER_INTERVAL_MS = 1000; // タイマー更新間隔（ミリ秒）
-const INPUT_FOCUS_DELAY_MS = 100; // 入力フィールドにフォーカスを当てる遅延時間（ミリ秒）
-const IMMEDIATE_FOCUS_DELAY_MS = 0; // 即時フォーカス用の遅延時間（ミリ秒）
-const CHARS_PER_WORD_JAPANESE = 10; // 日本語(ローマ字)の1ワードあたりの文字数換算
-const CHARS_PER_WORD_ENGLISH = 5; // 英語の1ワードあたりの文字数換算
-const DEFAULT_ACCURACY = 100; // 精度のデフォルト値（%）
-const MINIMUM_ELAPSED_MINUTES = 1; // 最小経過時間（分）
-
+/**
+ * タイピングゲームのメインコンポーネント
+ * ゲームの状態管理、UI表示、ユーザー操作の処理を担当します
+ */
 function Game() {
   const { isAuthenticated } = useAuth();
-  const {
-    playMenuBGM,
-    playGameBGM,
-    playCorrectSE,
-    playIncorrectSE,
-    stopBGM,
-    playResultBGM,
-  } = useAudioContext();
-  const [gameState, setGameState] = useState<"ready" | "playing" | "finished">(
-    "ready"
-  );
-  const [language, setLanguage] = useState<Language>("japanese");
-  const [difficulty, setDifficulty] = useState<Difficulty>("beginner");
-  const [currentText, setCurrentText] = useState("");
-  const [currentJapaneseText, setCurrentJapaneseText] =
-    useState<JapaneseText | null>(null);
-  const [userInput, setUserInput] = useState("");
-  const [timeLeft, setTimeLeft] = useState(GAME_DURATION_SECONDS);
-  const [correctChars, setCorrectChars] = useState(0);
-  const [totalChars, setTotalChars] = useState(0);
-  const [wordsCompleted, setWordsCompleted] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [scoreSaved, setScoreSaved] = useState(false);
-  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
-  const [imeWarning, setImeWarning] = useState(false);
-  const [hasError, setHasError] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const { playMenuBGM, stopBGM } = useAudioContext();
 
-  // 利用可能な難易度を取得
-  const getAvailableDifficulties = (): Difficulty[] => {
-    if (isAuthenticated) {
-      return ["beginner", "intermediate", "advanced"];
-    }
-    return ["beginner"];
-  };
+  // ゲームロジックのフック
+  const { state, actions } = useGameLogic();
 
+  // スコア保存のフック
+  const { scoreSaved, isSaving, handleSaveScore } = useScoreSave();
+
+  /**
+   * ページマウント時の処理
+   * メニューBGMを再生し、アンマウント時に停止します
+   */
   useEffect(() => {
-    // ページマウント時にメニューBGMを再生（マウント時のみ実行）
     playMenuBGM();
-
-    // コンポーネントのアンマウント時にBGMを停止
     return () => {
       stopBGM();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // APIからテキストを取得
-  const fetchRandomText = useCallback(async (): Promise<string> => {
-    setIsLoading(true);
-    try {
-      const result = await fetchRandomTextWithFallback(language, difficulty);
-      setCurrentJapaneseText(result.japaneseText);
-      return result.text;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [language, difficulty]);
-
-  // 次のテキストを取得
-  const getNextText = useCallback(async () => {
-    try {
-      const text = await fetchRandomText();
-      setCurrentText(text);
-    } catch (error) {
-      console.error("次のテキストの取得に失敗しました:", error);
-
-      // 想定外のエラー発生時もゲームが継続できるようにローカルフォールバックを使用
-      const fallbackResult = getFallbackText(language);
-      setCurrentJapaneseText(fallbackResult.japaneseText);
-      setCurrentText(fallbackResult.text);
-    }
-  }, [fetchRandomText, language]);
-  // ゲーム開始
-  const startGame = useCallback(async () => {
-    setGameState("playing");
-    setUserInput("");
-    setTimeLeft(GAME_DURATION_SECONDS);
-    setCorrectChars(0);
-    setTotalChars(0);
-    setWordsCompleted(0);
-    setScoreSaved(false);
-    setHasError(false);
-    setCurrentSessionId(`${Date.now()}-${Math.random()}`);
-
-    // 難易度に応じたBGMを再生
-    playGameBGM(difficulty);
-
-    await getNextText();
-    // setTimeoutを使用して、レンダリング後に確実にフォーカスを当てる
-    setTimeout(() => {
-      inputRef.current?.focus();
-    }, INPUT_FOCUS_DELAY_MS);
-  }, [getNextText, playGameBGM, difficulty]);
-
-  // タイマー
-  useEffect(() => {
-    if (gameState !== "playing") return;
-
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          setGameState("finished");
-          stopBGM(); // ゲーム終了時にBGMを停止
-          playResultBGM(); // 結果BGMを再生
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, TIMER_INTERVAL_MS);
-
-    return () => clearInterval(timer);
-  }, [gameState, stopBGM, playResultBGM]);
-
-  // 難易度表示用のラベル
-  const getDifficultyLabel = (diff: Difficulty): string => {
-    switch (diff) {
-      case "beginner":
-        return "初級";
-      case "intermediate":
-        return "中級";
-      case "advanced":
-        return "上級";
-      default:
-        return "中級";
-    }
-  };
-
-  // 入力処理
-  const handleInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    // （ただしgameStateのチェックは必要）
-    if (gameState !== "playing") return;
-
-    const value = e.target.value.toLowerCase();
-    const prevLength = userInput.length;
-    const newLength = value.length;
-
-    // 文字が追加された場合のみ処理（削除時は無視）
-    if (newLength > prevLength) {
-      // エラー中は新しい入力を受け付けない
-      if (hasError) {
-        return;
+  /**
+   * スコアを保存する処理
+   */
+  const onSaveScore = async () => {
+    await handleSaveScore(
+      {
+        wpm: calculateWPM(state.correctChars, state.timeLeft, state.language),
+        accuracy: calculateAccuracy(state.correctChars, state.totalChars),
+        correctChars: state.correctChars,
+        wordsCompleted: state.wordsCompleted,
+        language: state.language,
+        difficulty: state.difficulty,
+      },
+      {
+        isAuthenticated,
+        difficulty: state.difficulty,
+        currentSessionId: state.currentSessionId,
       }
-
-      // 追加された文字の正誤判定
-      const addedChar = value[newLength - 1]; // ユーザーが追加した文字
-      const expectedChar = currentText[newLength - 1]; // 期待される文字
-
-      setTotalChars((prev) => prev + 1);
-
-      if (addedChar === expectedChar) {
-        // 正解の場合のみ入力を受け付ける
-        setCorrectChars((prev) => prev + 1);
-        setUserInput(value);
-        // 正常に入力できているので、IME警告を消す
-        if (imeWarning) {
-          setImeWarning(false);
-        }
-
-        // 正解チェック（全文完成したか）
-        if (value === currentText) {
-          setWordsCompleted((prev) => prev + 1);
-          setUserInput("");
-          // 単語完成時の正解SE
-          playCorrectSE();
-          await getNextText();
-          // テキスト完了後、inputフィールドに自動フォーカスを戻す
-          setTimeout(() => {
-            inputRef.current?.focus();
-          }, IMMEDIATE_FOCUS_DELAY_MS);
-        }
-      } else {
-        // 不正解の場合は赤色で表示するが、次の入力は受け付けない
-        playIncorrectSE();
-        setUserInput(value);
-        setHasError(true);
-      }
-    } else if (newLength < prevLength) {
-      // 削除時は入力を受け付ける
-      setUserInput(value);
-      // エラー状態をクリア（正しい位置まで戻ったら）
-      if (hasError) {
-        // 最後の文字を削除したら、エラー状態を解除
-        setHasError(false);
-      }
-    }
-  };
-
-  // IME入力の開始・終了を検知
-  const handleCompositionStart = () => {
-    // 全角入力の警告を表示
-    setImeWarning(true);
-  };
-
-  const handleCompositionEnd = async (
-    _e: React.CompositionEvent<HTMLInputElement>
-  ) => {
-    // setTimeoutを使用して、onChangeイベントの後に確実に状態をリセット
-    setTimeout(() => {
-      // 警告を非表示
-      setImeWarning(false);
-    }, IMMEDIATE_FOCUS_DELAY_MS);
-    // IME確定後の入力処理
-    // 注意: onChangeイベントで処理されるため、ここでは状態更新は行わない
-  };
-
-  // 言語ごとの「1ワード」を構成する文字数を返す
-  // 英語: 5文字 = 1ワード（一般的なWPM定義）
-  // 日本語(ローマ字): 1語あたりの入力文字数が多くなるため、補正として大きめの値を使用
-  const getCharsPerWord = (lang: Language): number => {
-    switch (lang) {
-      case "japanese":
-        return CHARS_PER_WORD_JAPANESE;
-      default:
-        return CHARS_PER_WORD_ENGLISH;
-    }
-  };
-
-  // WPM計算
-  const calculateWPM = () => {
-    const minutes =
-      (GAME_DURATION_SECONDS - timeLeft) / GAME_DURATION_SECONDS ||
-      MINIMUM_ELAPSED_MINUTES;
-    const charsPerWord = getCharsPerWord(language);
-    return Math.round(correctChars / charsPerWord / minutes);
-  };
-
-  // 精度計算
-  const calculateAccuracy = () => {
-    if (totalChars === 0) return DEFAULT_ACCURACY;
-    return Math.round((correctChars / totalChars) * DEFAULT_ACCURACY);
-  };
-
-  // スコア保存（上級クリア時のみ）
-  const handleSaveScore = async () => {
-    if (
-      !isAuthenticated ||
-      difficulty !== "advanced" ||
-      scoreSaved ||
-      !currentSessionId
-    )
-      return;
-
-    setIsSaving(true);
-    try {
-      await saveScore({
-        wpm: calculateWPM(),
-        accuracy: calculateAccuracy(),
-        correct_chars: correctChars,
-        words_completed: wordsCompleted,
-        language,
-        difficulty: "advanced",
-      });
-      setScoreSaved(true);
-      // セッションIDをクリアして、このセッションでは再保存できないようにする
-      setCurrentSessionId(null);
-    } catch (error) {
-      console.error("スコアの保存に失敗しました:", error);
-    } finally {
-      setIsSaving(false);
-    }
+    );
   };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       <GameHeader />
 
-      {/* ゲーム画面 */}
       <div className="w-full max-w-2xl">
-        {gameState === "ready" && (
+        {/* ゲーム準備画面 */}
+        {state.status === "ready" && (
           <GameSetup
-            language={language}
-            difficulty={difficulty}
-            isLoading={isLoading}
+            language={state.language}
+            difficulty={state.difficulty}
+            isLoading={state.isLoading}
             isAuthenticated={isAuthenticated}
-            availableDifficulties={getAvailableDifficulties()}
-            onLanguageChange={setLanguage}
-            onDifficultyChange={setDifficulty}
-            onStart={startGame}
+            availableDifficulties={getAvailableDifficulties(isAuthenticated)}
+            onLanguageChange={actions.setLanguage}
+            onDifficultyChange={actions.setDifficulty}
+            onStart={actions.startGame}
             getDifficultyLabel={getDifficultyLabel}
           />
         )}
 
-        {gameState === "playing" && (
+        {/* ゲームプレイ画面 */}
+        {state.status === "playing" && (
           <div>
             <GameStats
-              timeLeft={timeLeft}
-              wpm={calculateWPM()}
-              wordsCompleted={wordsCompleted}
-              difficulty={difficulty}
+              timeLeft={state.timeLeft}
+              wpm={calculateWPM(
+                state.correctChars,
+                state.timeLeft,
+                state.language
+              )}
+              wordsCompleted={state.wordsCompleted}
+              difficulty={state.difficulty}
               getDifficultyLabel={getDifficultyLabel}
             />
 
             <TypingArea
-              isLoading={isLoading}
-              language={language}
-              currentJapaneseText={currentJapaneseText}
-              currentText={currentText}
-              userInput={userInput}
+              isLoading={state.isLoading}
+              language={state.language}
+              currentJapaneseText={state.currentJapaneseText}
+              currentText={state.currentText}
+              userInput={state.userInput}
             />
 
-            <IMEWarning show={imeWarning} />
+            <IMEWarning show={state.imeWarning} />
 
             {/* 入力フィールド */}
             <input
-              ref={inputRef}
+              ref={actions.inputRef}
               type="text"
-              value={userInput}
-              onChange={handleInput}
-              onCompositionStart={handleCompositionStart}
-              onCompositionEnd={handleCompositionEnd}
+              value={state.userInput}
+              onChange={actions.handleInput}
+              onCompositionStart={actions.handleCompositionStart}
+              onCompositionEnd={actions.handleCompositionEnd}
               className="w-full bg-slate-700 text-white text-xl p-4 rounded-lg outline-none focus:ring-2 focus:ring-cyan-400"
               placeholder={
-                language === "japanese" ? "ローマ字で入力..." : "ここに入力..."
+                state.language === "japanese"
+                  ? "ローマ字で入力..."
+                  : "ここに入力..."
               }
               autoFocus
-              disabled={isLoading}
+              disabled={state.isLoading}
             />
           </div>
         )}
 
-        {gameState === "finished" && (
+        {/* ゲーム結果画面 */}
+        {state.status === "finished" && (
           <GameResult
-            wpm={calculateWPM()}
-            accuracy={calculateAccuracy()}
-            wordsCompleted={wordsCompleted}
-            correctChars={correctChars}
-            language={language}
-            difficulty={difficulty}
+            wpm={calculateWPM(
+              state.correctChars,
+              state.timeLeft,
+              state.language
+            )}
+            accuracy={calculateAccuracy(state.correctChars, state.totalChars)}
+            wordsCompleted={state.wordsCompleted}
+            correctChars={state.correctChars}
+            language={state.language}
+            difficulty={state.difficulty}
             isAuthenticated={isAuthenticated}
             scoreSaved={scoreSaved}
             isSaving={isSaving}
-            onSaveScore={handleSaveScore}
-            onRestart={startGame}
+            onSaveScore={onSaveScore}
+            onRestart={actions.startGame}
             getDifficultyLabel={getDifficultyLabel}
           />
         )}
