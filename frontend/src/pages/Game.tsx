@@ -16,6 +16,16 @@ import { TypingArea } from "../components/game/TypingArea";
 import { IMEWarning } from "../components/game/IMEWarning";
 import { GameResult } from "../components/game/GameResult";
 
+// ゲーム設定の定数
+const GAME_DURATION_SECONDS = 60; // ゲーム時間（秒）
+const TIMER_INTERVAL_MS = 1000; // タイマー更新間隔（ミリ秒）
+const INPUT_FOCUS_DELAY_MS = 100; // 入力フィールドにフォーカスを当てる遅延時間（ミリ秒）
+const IMMEDIATE_FOCUS_DELAY_MS = 0; // 即時フォーカス用の遅延時間（ミリ秒）
+const CHARS_PER_WORD_JAPANESE = 10; // 日本語(ローマ字)の1ワードあたりの文字数換算
+const CHARS_PER_WORD_ENGLISH = 5; // 英語の1ワードあたりの文字数換算
+const DEFAULT_ACCURACY = 100; // 精度のデフォルト値（%）
+const MINIMUM_ELAPSED_MINUTES = 1; // 最小経過時間（分）
+
 function Game() {
   const { isAuthenticated } = useAuth();
   const {
@@ -35,7 +45,7 @@ function Game() {
   const [currentJapaneseText, setCurrentJapaneseText] =
     useState<JapaneseText | null>(null);
   const [userInput, setUserInput] = useState("");
-  const [timeLeft, setTimeLeft] = useState(60);
+  const [timeLeft, setTimeLeft] = useState(GAME_DURATION_SECONDS);
   const [correctChars, setCorrectChars] = useState(0);
   const [totalChars, setTotalChars] = useState(0);
   const [wordsCompleted, setWordsCompleted] = useState(0);
@@ -96,7 +106,7 @@ function Game() {
   const startGame = useCallback(async () => {
     setGameState("playing");
     setUserInput("");
-    setTimeLeft(60);
+    setTimeLeft(GAME_DURATION_SECONDS);
     setCorrectChars(0);
     setTotalChars(0);
     setWordsCompleted(0);
@@ -111,7 +121,7 @@ function Game() {
     // setTimeoutを使用して、レンダリング後に確実にフォーカスを当てる
     setTimeout(() => {
       inputRef.current?.focus();
-    }, 100);
+    }, INPUT_FOCUS_DELAY_MS);
   }, [getNextText, playGameBGM, difficulty]);
 
   // タイマー
@@ -128,7 +138,7 @@ function Game() {
         }
         return prev - 1;
       });
-    }, 1000);
+    }, TIMER_INTERVAL_MS);
 
     return () => clearInterval(timer);
   }, [gameState, stopBGM, playResultBGM]);
@@ -149,7 +159,6 @@ function Game() {
 
   // 入力処理
   const handleInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    // IME入力中はonChangeイベントが発火しないため、isComposingチェックは不要
     // （ただしgameStateのチェックは必要）
     if (gameState !== "playing") return;
 
@@ -189,7 +198,7 @@ function Game() {
           // テキスト完了後、inputフィールドに自動フォーカスを戻す
           setTimeout(() => {
             inputRef.current?.focus();
-          }, 0);
+          }, IMMEDIATE_FOCUS_DELAY_MS);
         }
       } else {
         // 不正解の場合は赤色で表示するが、次の入力は受け付けない
@@ -221,7 +230,7 @@ function Game() {
     setTimeout(() => {
       // 警告を非表示
       setImeWarning(false);
-    }, 0);
+    }, IMMEDIATE_FOCUS_DELAY_MS);
     // IME確定後の入力処理
     // 注意: onChangeイベントで処理されるため、ここでは状態更新は行わない
   };
@@ -232,23 +241,25 @@ function Game() {
   const getCharsPerWord = (lang: Language): number => {
     switch (lang) {
       case "japanese":
-        return 10;
+        return CHARS_PER_WORD_JAPANESE;
       default:
-        return 5;
+        return CHARS_PER_WORD_ENGLISH;
     }
   };
 
   // WPM計算
   const calculateWPM = () => {
-    const minutes = (60 - timeLeft) / 60 || 1;
+    const minutes =
+      (GAME_DURATION_SECONDS - timeLeft) / GAME_DURATION_SECONDS ||
+      MINIMUM_ELAPSED_MINUTES;
     const charsPerWord = getCharsPerWord(language);
     return Math.round(correctChars / charsPerWord / minutes);
   };
 
   // 精度計算
   const calculateAccuracy = () => {
-    if (totalChars === 0) return 100;
-    return Math.round((correctChars / totalChars) * 100);
+    if (totalChars === 0) return DEFAULT_ACCURACY;
+    return Math.round((correctChars / totalChars) * DEFAULT_ACCURACY);
   };
 
   // スコア保存（上級クリア時のみ）
