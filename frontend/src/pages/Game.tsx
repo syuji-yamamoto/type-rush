@@ -2,33 +2,15 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import type { JapaneseText } from "../types/types";
 import {
-  getRandomSampleText,
   type Difficulty,
   type Language,
+  fetchRandomTextWithFallback,
+  getFallbackText,
 } from "../api/sampleText";
 import { saveScore } from "../api/score";
 import { useAuth } from "../contexts/AuthContext";
 import { useAudioContext } from "../contexts/AudioContext";
 import { AudioControl } from "../components/AudioControl";
-
-// フォールバック用のローカルテキスト（API障害時用）
-const fallbackJapaneseTexts: JapaneseText[] = [
-  {
-    display: "今日はいい天気ですね",
-    reading: "きょうはいいてんきですね",
-    romaji: "kyouhaiitenkindesune",
-  },
-  {
-    display: "プログラミングは楽しい",
-    reading: "ぷろぐらみんぐはたのしい",
-    romaji: "puroguraminguhatanoshii",
-  },
-];
-
-const fallbackEnglishTexts = [
-  "the quick brown fox jumps over the lazy dog",
-  "programming is the art of telling a computer what to do",
-];
 
 function Game() {
   const { isAuthenticated } = useAuth();
@@ -84,35 +66,9 @@ function Game() {
   const fetchRandomText = useCallback(async (): Promise<string> => {
     setIsLoading(true);
     try {
-      const response = await getRandomSampleText(language, difficulty);
-
-      if (language === "japanese") {
-        setCurrentJapaneseText({
-          display: response.display_text || "",
-          reading: response.reading || "",
-          romaji: response.text,
-        });
-        return response.text;
-      } else {
-        setCurrentJapaneseText(null);
-        return response.text;
-      }
-    } catch (error) {
-      console.error("サンプルテキストの取得に失敗しました:", error);
-      // フォールバック：ローカルテキストを使用
-      if (language === "japanese") {
-        const text =
-          fallbackJapaneseTexts[
-            Math.floor(Math.random() * fallbackJapaneseTexts.length)
-          ];
-        setCurrentJapaneseText(text);
-        return text.romaji;
-      } else {
-        setCurrentJapaneseText(null);
-        return fallbackEnglishTexts[
-          Math.floor(Math.random() * fallbackEnglishTexts.length)
-        ];
-      }
+      const result = await fetchRandomTextWithFallback(language, difficulty);
+      setCurrentJapaneseText(result.japaneseText);
+      return result.text;
     } finally {
       setIsLoading(false);
     }
@@ -127,21 +83,9 @@ function Game() {
       console.error("次のテキストの取得に失敗しました:", error);
 
       // 想定外のエラー発生時もゲームが継続できるようにローカルフォールバックを使用
-      if (language === "japanese") {
-        const text =
-          fallbackJapaneseTexts[
-            Math.floor(Math.random() * fallbackJapaneseTexts.length)
-          ];
-        setCurrentJapaneseText(text);
-        setCurrentText(text.romaji);
-      } else {
-        setCurrentJapaneseText(null);
-        const text =
-          fallbackEnglishTexts[
-            Math.floor(Math.random() * fallbackEnglishTexts.length)
-          ];
-        setCurrentText(text);
-      }
+      const fallbackResult = getFallbackText(language);
+      setCurrentJapaneseText(fallbackResult.japaneseText);
+      setCurrentText(fallbackResult.text);
     }
   }, [fetchRandomText, language]);
   // ゲーム開始
