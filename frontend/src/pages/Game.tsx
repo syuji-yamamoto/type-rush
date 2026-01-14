@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Link } from "react-router-dom";
 import type { JapaneseText } from "../types/types";
 import {
   type Difficulty,
@@ -10,7 +9,12 @@ import {
 import { saveScore } from "../api/score";
 import { useAuth } from "../contexts/AuthContext";
 import { useAudioContext } from "../contexts/AudioContext";
-import { AudioControl } from "../components/AudioControl";
+import { GameHeader } from "../components/game/GameHeader";
+import { GameSetup } from "../components/game/GameSetup";
+import { GameStats } from "../components/game/GameStats";
+import { TypingArea } from "../components/game/TypingArea";
+import { IMEWarning } from "../components/game/IMEWarning";
+import { GameResult } from "../components/game/GameResult";
 
 function Game() {
   const { isAuthenticated } = useAuth();
@@ -279,177 +283,43 @@ function Game() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
-      {/* ヘッダー */}
-      <div className="absolute top-4 left-4">
-        <Link to="/" className="text-gray-300 hover:text-white">
-          ← ホームに戻る
-        </Link>
-      </div>
-
-      {/* 音量コントロール */}
-      <div className="absolute top-4 right-4">
-        <AudioControl />
-      </div>
+      <GameHeader />
 
       {/* ゲーム画面 */}
       <div className="w-full max-w-2xl">
         {gameState === "ready" && (
-          <div className="text-center">
-            <h2 className="text-3xl text-white mb-8">準備はいいですか？</h2>
-
-            {/* 言語選択 */}
-            <div className="mb-6">
-              <p className="text-gray-300 mb-4">言語を選択:</p>
-              <div className="flex justify-center gap-4">
-                <button
-                  onClick={() => setLanguage("japanese")}
-                  className={`px-6 py-3 rounded-lg font-bold transition-all ${
-                    language === "japanese"
-                      ? "bg-cyan-500 text-white"
-                      : "bg-gray-600 text-gray-300 hover:bg-gray-500"
-                  }`}
-                >
-                  日本語
-                </button>
-                <button
-                  onClick={() => setLanguage("english")}
-                  className={`px-6 py-3 rounded-lg font-bold transition-all ${
-                    language === "english"
-                      ? "bg-cyan-500 text-white"
-                      : "bg-gray-600 text-gray-300 hover:bg-gray-500"
-                  }`}
-                >
-                  English
-                </button>
-              </div>
-            </div>
-
-            {/* 難易度選択 */}
-            <div className="mb-8">
-              <p className="text-gray-300 mb-4">難易度を選択:</p>
-              <div className="flex justify-center gap-4">
-                {(["beginner", "intermediate", "advanced"] as Difficulty[]).map(
-                  (diff) => {
-                    const isAvailable =
-                      getAvailableDifficulties().includes(diff);
-                    return (
-                      <button
-                        key={diff}
-                        onClick={() => isAvailable && setDifficulty(diff)}
-                        disabled={!isAvailable}
-                        className={`px-6 py-3 rounded-lg font-bold transition-all ${
-                          difficulty === diff
-                            ? "bg-cyan-500 text-white"
-                            : isAvailable
-                            ? "bg-gray-600 text-gray-300 hover:bg-gray-500"
-                            : "bg-gray-700 text-gray-500 cursor-not-allowed"
-                        }`}
-                        title={!isAvailable ? "ログインすると利用可能" : ""}
-                      >
-                        {getDifficultyLabel(diff)}
-                        {!isAvailable && " 🔒"}
-                      </button>
-                    );
-                  }
-                )}
-              </div>
-              {!isAuthenticated && (
-                <p className="text-yellow-400 text-sm mt-4">
-                  💡{" "}
-                  <Link to="/login" className="underline hover:text-yellow-300">
-                    ログイン
-                  </Link>
-                  すると中級・上級がプレイできます
-                </p>
-              )}
-            </div>
-
-            <button
-              onClick={startGame}
-              disabled={isLoading}
-              className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-4 px-12 rounded-lg text-xl transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? "読み込み中..." : "スタート"}
-            </button>
-          </div>
+          <GameSetup
+            language={language}
+            difficulty={difficulty}
+            isLoading={isLoading}
+            isAuthenticated={isAuthenticated}
+            availableDifficulties={getAvailableDifficulties()}
+            onLanguageChange={setLanguage}
+            onDifficultyChange={setDifficulty}
+            onStart={startGame}
+            getDifficultyLabel={getDifficultyLabel}
+          />
         )}
 
         {gameState === "playing" && (
           <div>
-            {/* タイマーとスコア */}
-            <div className="flex justify-between mb-8">
-              <div className="text-4xl font-bold text-cyan-400">
-                {timeLeft}秒
-              </div>
-              <div className="text-right">
-                <div className="text-gray-300">WPM: {calculateWPM()}</div>
-                <div className="text-gray-300">完了: {wordsCompleted}</div>
-                <div className="text-gray-400 text-sm">
-                  {getDifficultyLabel(difficulty)}
-                </div>
-              </div>
-            </div>
+            <GameStats
+              timeLeft={timeLeft}
+              wpm={calculateWPM()}
+              wordsCompleted={wordsCompleted}
+              difficulty={difficulty}
+              getDifficultyLabel={getDifficultyLabel}
+            />
 
-            {/* タイピングエリア */}
-            <div className="bg-slate-800 rounded-lg p-6 mb-4">
-              {isLoading ? (
-                <div className="text-center text-gray-400 py-8">
-                  読み込み中...
-                </div>
-              ) : (
-                <>
-                  {/* 日本語の場合：ルビ表示 */}
-                  {language === "japanese" && currentJapaneseText && (
-                    <div className="mb-4">
-                      <p className="text-3xl text-white mb-2 leading-relaxed">
-                        <ruby>
-                          {currentJapaneseText.display
-                            .split("")
-                            .map((char, index) => {
-                              return (
-                                <span
-                                  key={index}
-                                  className="text-4xl font-bold"
-                                >
-                                  {char}
-                                </span>
-                              );
-                            })}
-                          <rt className="text-gray-400 text-base font-bold">
-                            {currentJapaneseText.reading}
-                          </rt>
-                        </ruby>
-                      </p>
-                    </div>
-                  )}
+            <TypingArea
+              isLoading={isLoading}
+              language={language}
+              currentJapaneseText={currentJapaneseText}
+              currentText={currentText}
+              userInput={userInput}
+            />
 
-                  {/* ローマ字/英語表示 */}
-                  <p className="text-2xl text-gray-300 font-mono mb-4 leading-relaxed">
-                    {currentText.split("").map((char, index) => {
-                      let className = "text-gray-400";
-                      if (index < userInput.length) {
-                        className =
-                          userInput[index] === char
-                            ? "text-green-400"
-                            : "text-red-400";
-                      }
-                      return (
-                        <span key={index} className={className}>
-                          {char}
-                        </span>
-                      );
-                    })}
-                  </p>
-                </>
-              )}
-            </div>
-
-            {/* IME警告 */}
-            {imeWarning && (
-              <div className="mb-2 p-3 bg-yellow-900/50 border border-yellow-500 rounded-lg text-yellow-300 text-sm">
-                ⚠️ 全角入力モードになっています。半角英数字で入力してください。
-              </div>
-            )}
+            <IMEWarning show={imeWarning} />
 
             {/* 入力フィールド */}
             <input
@@ -470,99 +340,20 @@ function Game() {
         )}
 
         {gameState === "finished" && (
-          <div className="text-center">
-            <h2 className="text-4xl text-white mb-8">結果</h2>
-            <div className="bg-slate-800 rounded-lg p-8 mb-8">
-              <div className="grid grid-cols-2 gap-6 text-left">
-                <div>
-                  <p className="text-gray-400">WPM</p>
-                  <p className="text-4xl font-bold text-cyan-400">
-                    {calculateWPM()}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-400">精度</p>
-                  <p className="text-4xl font-bold text-green-400">
-                    {calculateAccuracy()}%
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-400">完了した文章</p>
-                  <p className="text-2xl text-white">{wordsCompleted}</p>
-                </div>
-                <div>
-                  <p className="text-gray-400">正確な文字数</p>
-                  <p className="text-2xl text-white">{correctChars}</p>
-                </div>
-              </div>
-              <div className="mt-4 pt-4 border-t border-gray-700">
-                <p className="text-gray-400 text-sm">
-                  言語: {language === "english" ? "English" : "日本語"} /
-                  難易度: {getDifficultyLabel(difficulty)}
-                </p>
-              </div>
-
-              {/* スコア保存セクション（上級のみ） */}
-              {isAuthenticated && difficulty === "advanced" && (
-                <div className="mt-4 pt-4 border-t border-gray-700">
-                  {scoreSaved ? (
-                    <p className="text-green-400">
-                      ✅ スコアを保存しました！
-                      <Link
-                        to="/results"
-                        className="underline ml-2 hover:text-green-300"
-                      >
-                        履歴を見る
-                      </Link>
-                    </p>
-                  ) : (
-                    <button
-                      onClick={handleSaveScore}
-                      disabled={isSaving}
-                      className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-6 rounded-lg transition-all disabled:opacity-50"
-                    >
-                      {isSaving ? "保存中..." : "🏆 スコアを保存"}
-                    </button>
-                  )}
-                </div>
-              )}
-              {isAuthenticated && difficulty !== "advanced" && (
-                <div className="mt-4 pt-4 border-t border-gray-700">
-                  <p className="text-yellow-400 text-sm">
-                    💡 上級をクリアするとスコアを保存できます
-                  </p>
-                </div>
-              )}
-              {!isAuthenticated && (
-                <div className="mt-4 pt-4 border-t border-gray-700">
-                  <p className="text-yellow-400 text-sm">
-                    💡{" "}
-                    <Link
-                      to="/login"
-                      className="underline hover:text-yellow-300"
-                    >
-                      ログイン
-                    </Link>
-                    して上級をクリアするとスコアを保存できます
-                  </p>
-                </div>
-              )}
-            </div>
-            <div className="space-x-4">
-              <button
-                onClick={startGame}
-                className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-8 rounded-lg transition-all"
-              >
-                もう一度
-              </button>
-              <Link
-                to="/"
-                className="inline-block bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-lg transition-all"
-              >
-                ホームに戻る
-              </Link>
-            </div>
-          </div>
+          <GameResult
+            wpm={calculateWPM()}
+            accuracy={calculateAccuracy()}
+            wordsCompleted={wordsCompleted}
+            correctChars={correctChars}
+            language={language}
+            difficulty={difficulty}
+            isAuthenticated={isAuthenticated}
+            scoreSaved={scoreSaved}
+            isSaving={isSaving}
+            onSaveScore={handleSaveScore}
+            onRestart={startGame}
+            getDifficultyLabel={getDifficultyLabel}
+          />
         )}
       </div>
     </div>
