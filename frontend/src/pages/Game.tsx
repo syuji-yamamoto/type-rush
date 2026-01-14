@@ -58,6 +58,7 @@ function Game() {
   const [scoreSaved, setScoreSaved] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [imeWarning, setImeWarning] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // 利用可能な難易度を取得
@@ -152,6 +153,7 @@ function Game() {
     setTotalChars(0);
     setWordsCompleted(0);
     setScoreSaved(false);
+    setHasError(false);
     setCurrentSessionId(`${Date.now()}-${Math.random()}`);
 
     // 難易度に応じたBGMを再生
@@ -209,6 +211,11 @@ function Game() {
 
     // 文字が追加された場合のみ処理（削除時は無視）
     if (newLength > prevLength) {
+      // エラー中は新しい入力を受け付けない
+      if (hasError) {
+        return;
+      }
+
       // 追加された文字の正誤判定
       const addedChar = value[newLength - 1]; // ユーザーが追加した文字
       const expectedChar = currentText[newLength - 1]; // 期待される文字
@@ -237,12 +244,19 @@ function Game() {
           }, 0);
         }
       } else {
-        // 不正解の場合は入力を受け付けず、SEのみ再生
+        // 不正解の場合は赤色で表示するが、次の入力は受け付けない
         playIncorrectSE();
+        setUserInput(value);
+        setHasError(true);
       }
     } else if (newLength < prevLength) {
       // 削除時は入力を受け付ける
       setUserInput(value);
+      // エラー状態をクリア（正しい位置まで戻ったら）
+      if (hasError) {
+        // 最後の文字を削除したら、エラー状態を解除
+        setHasError(false);
+      }
     }
   };
 
@@ -457,7 +471,7 @@ function Game() {
                                 </span>
                               );
                             })}
-                          <rt className="text-gray-400 text-xl font-bold">
+                          <rt className="text-gray-400 text-base font-bold">
                             {currentJapaneseText.reading}
                           </rt>
                         </ruby>
@@ -468,14 +482,12 @@ function Game() {
                   {/* ローマ字/英語表示 */}
                   <p className="text-2xl text-gray-300 font-mono mb-4 leading-relaxed">
                     {currentText.split("").map((char, index) => {
-                      let className = "text-gray-500";
+                      let className = "text-gray-400";
                       if (index < userInput.length) {
                         className =
                           userInput[index] === char
                             ? "text-green-400"
-                            : "text-red-400 bg-red-900/30";
-                      } else if (index === userInput.length) {
-                        className = "text-white border-l-2 border-cyan-400";
+                            : "text-red-400";
                       }
                       return (
                         <span key={index} className={className}>
