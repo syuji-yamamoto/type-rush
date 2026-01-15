@@ -1,4 +1,9 @@
-import React, { createContext, useContext, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  ReactNode,
+  useCallback,
+} from "react";
 import { useAudio } from "../hooks/useAudio";
 
 // 音源パスの定数定義
@@ -49,43 +54,50 @@ interface AudioProviderProps {
 export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
   const audio = useAudio();
 
-  const playMenuBGM = () => {
+  const playMenuBGM = useCallback(() => {
     audio.play(AUDIO_PATHS.bgm.menu, "bgm", true);
-  };
+  }, [audio]);
 
-  const playGameBGM = (
-    difficulty: "beginner" | "intermediate" | "advanced"
-  ) => {
-    audio.play(AUDIO_PATHS.bgm[difficulty], "bgm", true);
-  };
+  const playGameBGM = useCallback(
+    (difficulty: "beginner" | "intermediate" | "advanced") => {
+      audio.play(AUDIO_PATHS.bgm[difficulty], "bgm", true);
+    },
+    [audio]
+  );
 
-  const playResultBGM = () => {
+  const playResultBGM = useCallback(() => {
     audio.play(AUDIO_PATHS.bgm.result, "bgm", false);
-  };
+  }, [audio]);
 
-  const playCorrectSE = () => {
+  const playCorrectSE = useCallback(() => {
     audio.play(AUDIO_PATHS.se.correct, "se");
-  };
+  }, [audio]);
 
-  const playIncorrectSE = () => {
+  const playIncorrectSE = useCallback(() => {
     audio.play(AUDIO_PATHS.se.incorrect, "se");
-  };
+  }, [audio]);
 
-  const stopBGM = () => {
+  const stopBGM = useCallback(() => {
     audio.stop("bgm");
-  };
+  }, [audio]);
 
-  const stopAllAudio = () => {
+  const stopAllAudio = useCallback(() => {
     audio.stop();
-  };
+  }, [audio]);
 
-  const setBGMEnabled = (enabled: boolean) => {
-    audio.setEnabled("bgm", enabled);
-  };
+  const setBGMEnabled = useCallback(
+    (enabled: boolean) => {
+      audio.setEnabled("bgm", enabled);
+    },
+    [audio]
+  );
 
-  const setSEEnabled = (enabled: boolean) => {
-    audio.setEnabled("se", enabled);
-  };
+  const setSEEnabled = useCallback(
+    (enabled: boolean) => {
+      audio.setEnabled("se", enabled);
+    },
+    [audio]
+  );
 
   const contextValue: AudioContextValue = {
     playMenuBGM,
