@@ -104,6 +104,31 @@ export const getDifficulties = async (): Promise<GetDifficultiesResponse> => {
 };
 
 /**
+ * ランダムなフォールバックテキストを選択する共通ヘルパー関数
+ */
+const selectRandomFallbackText = (language: Language): FetchTextResult => {
+  if (language === "japanese") {
+    const text =
+      fallbackJapaneseTexts[
+        Math.floor(Math.random() * fallbackJapaneseTexts.length)
+      ];
+    return {
+      text: text.romaji,
+      japaneseText: text,
+    };
+  } else {
+    const text =
+      fallbackEnglishTexts[
+        Math.floor(Math.random() * fallbackEnglishTexts.length)
+      ];
+    return {
+      text,
+      japaneseText: null,
+    };
+  }
+};
+
+/**
  * ランダムなサンプルテキストを取得し、フォールバック処理も含む
  */
 export const fetchRandomTextWithFallback = async (
@@ -131,27 +156,8 @@ export const fetchRandomTextWithFallback = async (
     }
   } catch (error) {
     console.error("サンプルテキストの取得に失敗しました:", error);
-
     // フォールバック：ローカルテキストを使用
-    if (language === "japanese") {
-      const text =
-        fallbackJapaneseTexts[
-          Math.floor(Math.random() * fallbackJapaneseTexts.length)
-        ];
-      return {
-        text: text.romaji,
-        japaneseText: text,
-      };
-    } else {
-      const text =
-        fallbackEnglishTexts[
-          Math.floor(Math.random() * fallbackEnglishTexts.length)
-        ];
-      return {
-        text,
-        japaneseText: null,
-      };
-    }
+    return selectRandomFallbackText(language);
   }
 };
 
@@ -159,23 +165,5 @@ export const fetchRandomTextWithFallback = async (
  * フォールバック用のテキストを取得（想定外のエラー発生時）
  */
 export const getFallbackText = (language: Language): FetchTextResult => {
-  if (language === "japanese") {
-    const text =
-      fallbackJapaneseTexts[
-        Math.floor(Math.random() * fallbackJapaneseTexts.length)
-      ];
-    return {
-      text: text.romaji,
-      japaneseText: text,
-    };
-  } else {
-    const text =
-      fallbackEnglishTexts[
-        Math.floor(Math.random() * fallbackEnglishTexts.length)
-      ];
-    return {
-      text,
-      japaneseText: null,
-    };
-  }
+  return selectRandomFallbackText(language);
 };

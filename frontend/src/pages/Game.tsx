@@ -28,7 +28,8 @@ function Game() {
   const { state, actions } = useGameLogic();
 
   // スコア保存のフック
-  const { scoreSaved, isSaving, handleSaveScore } = useScoreSave();
+  const { scoreSaved, isSaving, handleSaveScore, resetScoreSaveState } =
+    useScoreSave();
 
   /**
    * ページマウント時の処理
@@ -39,28 +40,41 @@ function Game() {
     return () => {
       stopBGM();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [playMenuBGM, stopBGM]);
 
   /**
    * スコアを保存する処理
    */
   const onSaveScore = async () => {
-    await handleSaveScore(
-      {
-        wpm: calculateWPM(state.correctChars, state.timeLeft, state.language),
-        accuracy: calculateAccuracy(state.correctChars, state.totalChars),
-        correctChars: state.correctChars,
-        wordsCompleted: state.wordsCompleted,
-        language: state.language,
-        difficulty: state.difficulty,
-      },
-      {
-        isAuthenticated,
-        difficulty: state.difficulty,
-        currentSessionId: state.currentSessionId,
-      }
-    );
+    try {
+      await handleSaveScore(
+        {
+          wpm: calculateWPM(state.correctChars, state.timeLeft, state.language),
+          accuracy: calculateAccuracy(state.correctChars, state.totalChars),
+          correctChars: state.correctChars,
+          wordsCompleted: state.wordsCompleted,
+          language: state.language,
+          difficulty: state.difficulty,
+        },
+        {
+          isAuthenticated,
+          difficulty: state.difficulty,
+          currentSessionId: state.currentSessionId,
+        }
+      );
+    } catch (error) {
+      // エラーはuseScoreSaveフック内でログに記録されているため、
+      // ここでは特に何もしない（UIへのエラー表示などを追加する場合はここで実装）
+      console.error("スコア保存処理でエラーが発生しました:", error);
+    }
+  };
+
+  /**
+   * ゲームを再開する処理
+   */
+  const onRestart = () => {
+    resetScoreSaveState();
+    actions.startGame();
   };
 
   return (
@@ -145,7 +159,7 @@ function Game() {
             scoreSaved={scoreSaved}
             isSaving={isSaving}
             onSaveScore={onSaveScore}
-            onRestart={actions.startGame}
+            onRestart={onRestart}
             getDifficultyLabel={getDifficultyLabel}
           />
         )}
