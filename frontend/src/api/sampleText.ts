@@ -1,5 +1,6 @@
 import apiClient from "./client";
 import type { JapaneseText } from "../types/types";
+import fallbackTextsData from "../config/fallbackTexts.json";
 
 export type Difficulty = "beginner" | "intermediate" | "advanced";
 export type Language = "english" | "japanese";
@@ -41,24 +42,9 @@ export interface FetchTextResult {
   japaneseText: JapaneseText | null;
 }
 
-// フォールバック用のローカルテキスト（API障害時用）
-const fallbackJapaneseTexts: JapaneseText[] = [
-  {
-    display: "今日はいい天気ですね",
-    reading: "きょうはいいてんきですね",
-    romaji: "kyouhaiitenkindesune",
-  },
-  {
-    display: "プログラミングは楽しい",
-    reading: "ぷろぐらみんぐはたのしい",
-    romaji: "puroguraminguhatanoshii",
-  },
-];
-
-const fallbackEnglishTexts = [
-  "the quick brown fox jumps over the lazy dog",
-  "programming is the art of telling a computer what to do",
-];
+// フォールバック用のローカルテキスト（外部設定ファイルから読み込み）
+const fallbackJapaneseTexts: JapaneseText[] = fallbackTextsData.japanese;
+const fallbackEnglishTexts: string[] = fallbackTextsData.english;
 
 /**
  * ランダムなサンプルテキストを1件取得
@@ -133,9 +119,46 @@ const selectRandomFallbackText = (language: Language): FetchTextResult => {
  */
 export const fetchRandomTextWithFallback = async (
   language: Language,
-  difficulty: Difficulty
-): Promise<FetchTextResult> => {
+  difficulty: Difficulty,
+  excludedIds: number[] = []
+): Promise<FetchTextResult & { id?: number }> => {
   try {
+    // 除外IDリストがある場合は複数件取得して除外処理
+    if (excludedIds.length > 0) {
+      const listResponse = await getRandomSampleTextList(
+        language,
+        difficulty,
+        Math.max(20, excludedIds.length + 10)
+      );
+
+      // 除外されていないテキストを探す
+      const availableText = listResponse.data.find(
+        (item) => !excludedIds.includes(item.id)
+      );
+
+      if (availableText) {
+        if (language === "japanese") {
+          const japaneseText: JapaneseText = {
+            display: availableText.display_text || "",
+            reading: availableText.reading || "",
+            romaji: availableText.text,
+          };
+          return {
+            id: availableText.id,
+            text: availableText.text,
+            japaneseText,
+          };
+        } else {
+          return {
+            id: availableText.id,
+            text: availableText.text,
+            japaneseText: null,
+          };
+        }
+      }
+    }
+
+    // 除外IDがない場合、または除外後に該当するテキストがない場合は通常取得
     const response = await getRandomSampleText(language, difficulty);
 
     if (language === "japanese") {
@@ -145,11 +168,13 @@ export const fetchRandomTextWithFallback = async (
         romaji: response.text,
       };
       return {
+        id: response.id,
         text: response.text,
         japaneseText,
       };
     } else {
       return {
+        id: response.id,
         text: response.text,
         japaneseText: null,
       };
