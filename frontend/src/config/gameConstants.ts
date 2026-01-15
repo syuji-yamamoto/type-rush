@@ -4,7 +4,7 @@
  */
 
 /** ゲーム時間（秒） */
-export const GAME_DURATION_SECONDS = 5;
+export const GAME_DURATION_SECONDS = 60;
 
 /** タイマー更新間隔（ミリ秒） */
 export const TIMER_INTERVAL_MS = 1000;
