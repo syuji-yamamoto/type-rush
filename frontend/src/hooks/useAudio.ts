@@ -92,11 +92,15 @@ export const useAudio = (): UseAudioReturn => {
         audio.preload = "auto"; // 事前読み込みを有効化
 
         // 音声ファイルのロードを待ってから再生
-        audio.addEventListener("canplaythrough", () => {
-          audio.play().catch((error) => {
-            console.error("Failed to play BGM:", error);
-          });
-        }, { once: true });
+        audio.addEventListener(
+          "canplaythrough",
+          () => {
+            audio.play().catch((error) => {
+              console.error("Failed to play BGM:", error);
+            });
+          },
+          { once: true }
+        );
 
         // ロード開始
         audio.load();
@@ -188,11 +192,15 @@ export const useAudio = (): UseAudioReturn => {
         audio.volume = commonVolume;
         audio.preload = "auto";
 
-        audio.addEventListener("canplaythrough", () => {
-          audio.play().catch((error) => {
-            console.error("Failed to resume BGM:", error);
-          });
-        }, { once: true });
+        audio.addEventListener(
+          "canplaythrough",
+          () => {
+            audio.play().catch((error) => {
+              console.error("Failed to resume BGM:", error);
+            });
+          },
+          { once: true }
+        );
 
         audio.load();
 
