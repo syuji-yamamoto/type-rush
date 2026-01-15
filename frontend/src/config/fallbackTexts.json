@@ -1,0 +1,48 @@
+{
+  "japanese": [
+    {
+      "display": "猫",
+      "reading": "ねこ",
+      "romaji": "neko"
+    },
+    {
+      "display": "犬",
+      "reading": "いぬ",
+      "romaji": "inu"
+    },
+    {
+      "display": "桜",
+      "reading": "さくら",
+      "romaji": "sakura"
+    },
+    {
+      "display": "湖",
+      "reading": "みずうみ",
+      "romaji": "mizuumi"
+    },
+    {
+      "display": "光",
+      "reading": "ひかり",
+      "romaji": "hikari"
+    },
+    {
+      "display": "風",
+      "reading": "かぜ",
+      "romaji": "kaze"
+    },
+    {
+      "display": "空",
+      "reading": "そら",
+      "romaji": "sora"
+    }
+  ],
+  "english": [
+    "cat",
+    "dog",
+    "tree",
+    "bird",
+    "water",
+    "light",
+    "wind"
+  ]
+}

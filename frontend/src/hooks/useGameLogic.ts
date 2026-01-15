@@ -44,6 +44,8 @@ export interface GameState {
   imeWarning: boolean;
   /** エラー状態 */
   hasError: boolean;
+  /** 使用済みテキストIDリスト */
+  usedTextIds: number[];
 }
 
 /**
@@ -95,17 +97,22 @@ export const useGameLogic = () => {
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [imeWarning, setImeWarning] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [usedTextIds, setUsedTextIds] = useState<number[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   /**
-   * APIからランダムなテキストを取得
+   * APIからランダムなテキストを取得（使用済みテキストを除外）
    */
-  const fetchRandomText = async (): Promise<string> => {
+  const fetchRandomText = async (): Promise<{ text: string; id?: number }> => {
     setIsLoading(true);
     try {
-      const result = await fetchRandomTextWithFallback(language, difficulty);
+      const result = await fetchRandomTextWithFallback(
+        language,
+        difficulty,
+        usedTextIds
+      );
       setCurrentJapaneseText(result.japaneseText);
-      return result.text;
+      return { text: result.text, id: result.id };
     } finally {
       setIsLoading(false);
     }
@@ -116,8 +123,13 @@ export const useGameLogic = () => {
    */
   const getNextText = async () => {
     try {
-      const text = await fetchRandomText();
-      setCurrentText(text);
+      const result = await fetchRandomText();
+      setCurrentText(result.text);
+
+      // テキストIDがある場合は使用済みリストに追加
+      if (result.id !== undefined) {
+        setUsedTextIds((prev) => [...prev, result.id!]);
+      }
     } catch (error) {
       console.error("次のテキストの取得に失敗しました:", error);
 
@@ -139,6 +151,7 @@ export const useGameLogic = () => {
     setTotalChars(0);
     setWordsCompleted(0);
     setHasError(false);
+    setUsedTextIds([]); // 使用済みテキストIDリストをリセット
     setCurrentSessionId(`${Date.now()}-${Math.random()}`);
 
     // 難易度に応じたBGMを再生
@@ -264,6 +277,7 @@ export const useGameLogic = () => {
     currentSessionId,
     imeWarning,
     hasError,
+    usedTextIds,
   };
 
   const actions: GameActions = {
