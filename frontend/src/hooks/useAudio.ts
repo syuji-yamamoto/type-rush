@@ -79,18 +79,27 @@ export const useAudio = (): UseAudioReturn => {
           return;
         }
 
+        // 既存のBGMを停止
         if (bgmRef.current) {
           bgmRef.current.pause();
+          bgmRef.current.currentTime = 0;
           bgmRef.current = null;
         }
 
         const audio = new Audio(src);
         audio.loop = loop;
         audio.volume = commonVolume;
+        audio.preload = "auto"; // 事前読み込みを有効化
 
-        audio.play().catch((error) => {
-          console.error("Failed to play BGM:", error);
-        });
+        // 音声ファイルのロードを待ってから再生
+        audio.addEventListener("canplaythrough", () => {
+          audio.play().catch((error) => {
+            console.error("Failed to play BGM:", error);
+          });
+        }, { once: true });
+
+        // ロード開始
+        audio.load();
 
         bgmRef.current = audio;
         // 最後に再生したBGMの情報を保存
@@ -177,10 +186,15 @@ export const useAudio = (): UseAudioReturn => {
         const audio = new Audio(lastBgmSrcRef.current);
         audio.loop = lastBgmLoopRef.current;
         audio.volume = commonVolume;
+        audio.preload = "auto";
 
-        audio.play().catch((error) => {
-          console.error("Failed to resume BGM:", error);
-        });
+        audio.addEventListener("canplaythrough", () => {
+          audio.play().catch((error) => {
+            console.error("Failed to resume BGM:", error);
+          });
+        }, { once: true });
+
+        audio.load();
 
         bgmRef.current = audio;
       }
