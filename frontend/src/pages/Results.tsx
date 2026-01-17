@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { useAudioContext } from "../contexts/AudioContext";
 import { AudioControl } from "../components/AudioControl";
+import { BGMManager } from "../components/BGMManager";
 import {
   getScoreStats,
   getScoreHistory,
@@ -12,22 +12,11 @@ import {
 
 function Results() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const { playMenuBGM, stopBGM } = useAudioContext();
   const navigate = useNavigate();
   const [stats, setStats] = useState<ScoreStats | null>(null);
   const [scores, setScores] = useState<Score[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    // BGMの再生を開始
-    playMenuBGM();
-
-    return () => {
-      stopBGM();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     // 認証チェック
@@ -124,6 +113,9 @@ function Results() {
 
   return (
     <div className="min-h-screen p-4">
+      {/* BGM自動管理 */}
+      <BGMManager />
+
       {/* ヘッダー */}
       <div className="flex justify-between items-center mb-8">
         <Link to="/" className="text-gray-300 hover:text-white">
@@ -199,8 +191,8 @@ function Results() {
                         score.accuracy >= 95
                           ? "text-green-400"
                           : score.accuracy >= 90
-                          ? "text-yellow-400"
-                          : "text-red-400"
+                            ? "text-yellow-400"
+                            : "text-red-400"
                       }`}
                     >
                       {score.accuracy}%

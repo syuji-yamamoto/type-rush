@@ -71,15 +71,10 @@ export interface GameActions {
 /**
  * ゲームのメインロジックを管理するカスタムフック
  * ゲームの状態管理、タイマー、テキスト取得、入力処理などを提供します
+ * BGM管理はBGMManagerコンポーネントが担当するため、このフックではSE再生のみを処理します
  */
 export const useGameLogic = () => {
-  const {
-    playGameBGM,
-    playCorrectSE,
-    playIncorrectSE,
-    stopBGM,
-    playFinishedSE,
-  } = useAudioContext();
+  const { playCorrectSE, playIncorrectSE } = useAudioContext();
 
   // 状態管理
   const [gameState, setGameState] = useState<GameState["status"]>("ready");
@@ -142,6 +137,7 @@ export const useGameLogic = () => {
 
   /**
    * ゲームを開始
+   * BGMの切り替えはBGMManagerが状態変化を検知して自動的に行います
    */
   const startGame = async () => {
     setGameState("playing");
@@ -153,9 +149,6 @@ export const useGameLogic = () => {
     setHasError(false);
     setUsedTextIds([]); // 使用済みテキストIDリストをリセット
     setCurrentSessionId(`${Date.now()}-${Math.random()}`);
-
-    // 難易度に応じたBGMを再生
-    playGameBGM(difficulty);
 
     await getNextText();
     // レンダリング後に確実にフォーカスを当てる
@@ -243,6 +236,7 @@ export const useGameLogic = () => {
 
   /**
    * タイマー処理
+   * ゲーム終了時のBGM停止と終了SE再生はBGMManagerが担当
    */
   useEffect(() => {
     if (gameState !== "playing") return;
@@ -251,8 +245,6 @@ export const useGameLogic = () => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           setGameState("finished");
-          stopBGM();
-          playFinishedSE();
           return 0;
         }
         return prev - 1;
@@ -260,7 +252,7 @@ export const useGameLogic = () => {
     }, TIMER_INTERVAL_MS);
 
     return () => clearInterval(timer);
-  }, [gameState, stopBGM, playFinishedSE]);
+  }, [gameState]);
 
   const state: GameState = {
     status: gameState,
