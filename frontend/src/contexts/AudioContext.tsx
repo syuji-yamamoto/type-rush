@@ -56,18 +56,6 @@ interface AudioContextValue {
       enabled: boolean;
     };
   };
-
-  // // 後方互換性のための関数（将来的に削除予定）
-  // /** @deprecated setBGMSceneを使用してください */
-  // playMenuBGM: () => void;
-  // /** @deprecated setBGMSceneを使用してください */
-  // playGameBGM: (difficulty: "beginner" | "intermediate" | "advanced") => void;
-  // /** @deprecated playResultSEを使用してください */
-  // playFinishedSE: () => void;
-  // /** @deprecated setBGMScene('silent')を使用してください */
-  // stopBGM: () => void;
-  // /** @deprecated setBGMScene('silent')を使用してください */
-  // stopAllAudio: () => void;
 }
 
 const AudioContext = createContext<AudioContextValue | null>(null);
@@ -80,6 +68,7 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
   const audio = useAudio();
   const currentSceneRef = useRef<BGMScene>("silent");
   const resultSEPlayedRef = useRef<boolean>(false);
+  const previousBGMEnabledRef = useRef<boolean>(audio.config.bgm.enabled);
 
   // BGMシーンに対応するオーディオパスを取得
   const getBGMPathForScene = useCallback((scene: BGMScene): string | null => {
@@ -153,38 +142,21 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
     [audio]
   );
 
-  // 後方互換性のための関数群
-  // const playMenuBGM = useCallback(() => {
-  //   setBGMScene("menu");
-  // }, [setBGMScene]);
+  // BGM有効/無効の切り替えを監視して、適切に再生/停止
+  useEffect(() => {
+    const currentEnabled = audio.config.bgm.enabled;
+    const previousEnabled = previousBGMEnabledRef.current;
 
-  // const playGameBGM = useCallback(
-  //   (difficulty: "beginner" | "intermediate" | "advanced") => {
-  //     const sceneMap: Record<
-  //       "beginner" | "intermediate" | "advanced",
-  //       BGMScene
-  //     > = {
-  //       beginner: "game-beginner",
-  //       intermediate: "game-intermediate",
-  //       advanced: "game-advanced",
-  //     };
-  //     setBGMScene(sceneMap[difficulty]);
-  //   },
-  //   [setBGMScene]
-  // );
+    // BGMが有効化された場合、現在のシーンのBGMを再生
+    if (currentEnabled && !previousEnabled) {
+      const bgmPath = getBGMPathForScene(currentSceneRef.current);
+      if (bgmPath) {
+        audio.play(bgmPath, "bgm", true);
+      }
+    }
 
-  // const playFinishedSE = useCallback(() => {
-  //   playResultSE();
-  // }, [playResultSE]);
-
-  // const stopBGM = useCallback(() => {
-  //   setBGMScene("silent");
-  // }, [setBGMScene]);
-
-  // const stopAllAudio = useCallback(() => {
-  //   audio.stop();
-  //   currentSceneRef.current = "silent";
-  // }, [audio]);
+    previousBGMEnabledRef.current = currentEnabled;
+  }, [audio, audio.config.bgm.enabled, getBGMPathForScene]);
 
   // コンポーネントのアンマウント時にオーディオをクリーンアップ
   useEffect(() => {
@@ -203,12 +175,6 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
     setBGMEnabled,
     setSEEnabled,
     config: audio.config,
-    // 後方互換性
-    // playMenuBGM,
-    // playGameBGM,
-    // playFinishedSE,
-    // stopBGM,
-    // stopAllAudio,
   };
 
   return (

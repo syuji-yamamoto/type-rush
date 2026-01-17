@@ -167,48 +167,26 @@ export const useAudio = (): UseAudioReturn => {
     });
   }, []);
 
-  const setEnabled = useCallback(
-    (type: AudioType, enabled: boolean) => {
-      setConfig((prev) => ({
-        ...prev,
-        [type]: { ...prev[type], enabled },
-      }));
+  const setEnabled = useCallback((type: AudioType, enabled: boolean) => {
+    setConfig((prev) => ({
+      ...prev,
+      [type]: { ...prev[type], enabled },
+    }));
 
-      // BGMが無効化された場合は停止
-      if (type === "bgm" && !enabled && bgmRef.current) {
-        bgmRef.current.pause();
-        bgmRef.current = null;
-      }
+    // BGMが無効化された場合は停止
+    if (type === "bgm" && !enabled && bgmRef.current) {
+      bgmRef.current.pause();
+      bgmRef.current = null;
+    }
 
-      // BGMが有効化された場合、前回再生していた音楽があれば再開
-      if (
-        type === "bgm" &&
-        enabled &&
-        lastBgmSrcRef.current &&
-        !bgmRef.current
-      ) {
-        const audio = new Audio(lastBgmSrcRef.current);
-        audio.loop = lastBgmLoopRef.current;
-        audio.volume = commonVolume;
-        audio.preload = "auto";
-
-        audio.addEventListener(
-          "canplaythrough",
-          () => {
-            audio.play().catch((error) => {
-              console.error("Failed to resume BGM:", error);
-            });
-          },
-          { once: true }
-        );
-
-        audio.load();
-
-        bgmRef.current = audio;
-      }
-    },
-    [commonVolume]
-  );
+    // SEが無効化された場合は停止
+    if (type === "se" && !enabled) {
+      seRefs.current.forEach((audio) => {
+        audio.pause();
+      });
+      seRefs.current = [];
+    }
+  }, []);
 
   return {
     play,
