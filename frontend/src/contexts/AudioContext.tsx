@@ -3,6 +3,8 @@ import React, {
   useContext,
   ReactNode,
   useCallback,
+  useEffect,
+  useRef,
 } from "react";
 import { useAudio } from "../hooks/useAudio";
 
@@ -14,23 +16,34 @@ export const AUDIO_PATHS = {
     intermediate: new URL("../assets/bgm/intermediate.mp3", import.meta.url)
       .href,
     advanced: new URL("../assets/bgm/advanced.mp3", import.meta.url).href,
-    result: new URL("../assets/bgm/result.mp3", import.meta.url).href,
   },
   se: {
     correct: new URL("../assets/se/correct.mp3", import.meta.url).href,
     incorrect: new URL("../assets/se/incorrect.mp3", import.meta.url).href,
+    result: new URL("../assets/se/result.mp3", import.meta.url).href,
   },
 } as const;
 
+// BGMシーンの型定義
+export type BGMScene =
+  | "menu" // /home, /login, /register, /results, /game(準備画面)
+  | "game-beginner" // /game 初級
+  | "game-intermediate" // /game 中級
+  | "game-advanced" // /game 上級
+  | "silent"; // BGMなし（ゲーム終了画面など）
+
 interface AudioContextValue {
-  playMenuBGM: () => void;
-  playGameBGM: (difficulty: "beginner" | "intermediate" | "advanced") => void;
-  playResultBGM: () => void;
+  // シーンベースのBGM管理
+  setBGMScene: (scene: BGMScene) => void;
+  currentBGMScene: BGMScene;
+
+  // SE再生
   playCorrectSE: () => void;
   playIncorrectSE: () => void;
-  stopBGM: () => void;
-  stopAllAudio: () => void;
-  setVolume: (volume: number) => void;
+  playResultSE: () => void;
+
+  // 設定管理
+  // setVolume: (volume: number) => void; // 音量調整スライダーを削除したためコメントアウト。TODO:将来再実装する場合は復活させる
   setBGMEnabled: (enabled: boolean) => void;
   setSEEnabled: (enabled: boolean) => void;
   config: {
@@ -53,22 +66,51 @@ interface AudioProviderProps {
 
 export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
   const audio = useAudio();
+  const currentSceneRef = useRef<BGMScene>("silent");
+  const resultSEPlayedRef = useRef<boolean>(false);
+  const bgmEnabledRef = useRef<boolean>(audio.config.bgm.enabled);
 
-  const playMenuBGM = useCallback(() => {
-    audio.play(AUDIO_PATHS.bgm.menu, "bgm", true);
-  }, [audio]);
+  // BGMシーンに対応するオーディオパスを取得
+  const getBGMPathForScene = useCallback((scene: BGMScene): string | null => {
+    switch (scene) {
+      case "menu":
+        return AUDIO_PATHS.bgm.menu;
+      case "game-beginner":
+        return AUDIO_PATHS.bgm.beginner;
+      case "game-intermediate":
+        return AUDIO_PATHS.bgm.intermediate;
+      case "game-advanced":
+        return AUDIO_PATHS.bgm.advanced;
+      case "silent":
+        return null;
+      default:
+        return null;
+    }
+  }, []);
 
-  const playGameBGM = useCallback(
-    (difficulty: "beginner" | "intermediate" | "advanced") => {
-      audio.play(AUDIO_PATHS.bgm[difficulty], "bgm", true);
+  // BGMシーンを設定
+  const setBGMScene = useCallback(
+    (scene: BGMScene) => {
+      // 同じシーンなら何もしない
+      if (currentSceneRef.current === scene) {
+        return;
+      }
+
+      currentSceneRef.current = scene;
+      const bgmPath = getBGMPathForScene(scene);
+
+      if (bgmPath) {
+        audio.play(bgmPath, "bgm", true);
+        // シーンが変わったらresult SE再生フラグをリセット
+        resultSEPlayedRef.current = false;
+      } else {
+        audio.stop("bgm");
+      }
     },
-    [audio]
+    [audio, getBGMPathForScene]
   );
 
-  const playResultBGM = useCallback(() => {
-    audio.play(AUDIO_PATHS.bgm.result, "bgm", false);
-  }, [audio]);
-
+  // SE再生関数
   const playCorrectSE = useCallback(() => {
     audio.play(AUDIO_PATHS.se.correct, "se");
   }, [audio]);
@@ -77,14 +119,15 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
     audio.play(AUDIO_PATHS.se.incorrect, "se");
   }, [audio]);
 
-  const stopBGM = useCallback(() => {
-    audio.stop("bgm");
+  // ゲーム終了SE（一度だけ再生）
+  const playResultSE = useCallback(() => {
+    if (!resultSEPlayedRef.current) {
+      audio.play(AUDIO_PATHS.se.result, "se");
+      resultSEPlayedRef.current = true;
+    }
   }, [audio]);
 
-  const stopAllAudio = useCallback(() => {
-    audio.stop();
-  }, [audio]);
-
+  // 設定変更関数
   const setBGMEnabled = useCallback(
     (enabled: boolean) => {
       audio.setEnabled("bgm", enabled);
@@ -99,15 +142,38 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
     [audio]
   );
 
+  // BGM有効/無効の切り替えを監視して、適切に再生/停止
+  useEffect(() => {
+    const currentEnabled = audio.config.bgm.enabled;
+    const previousEnabled = bgmEnabledRef.current;
+
+    // BGMの有効状態が変わった時のみ処理
+    if (currentEnabled !== previousEnabled) {
+      if (currentEnabled) {
+        // BGMが有効化された場合、現在のシーンのBGMを再生
+        const bgmPath = getBGMPathForScene(currentSceneRef.current);
+        if (bgmPath) {
+          audio.play(bgmPath, "bgm", true);
+        }
+      }
+      bgmEnabledRef.current = currentEnabled;
+    }
+  }, [audio, audio.config.bgm.enabled, getBGMPathForScene]);
+
+  // コンポーネントのアンマウント時にオーディオをクリーンアップ
+  useEffect(() => {
+    return () => {
+      audio.stop();
+    };
+  }, [audio]);
+
   const contextValue: AudioContextValue = {
-    playMenuBGM,
-    playGameBGM,
-    playResultBGM,
+    setBGMScene,
+    currentBGMScene: currentSceneRef.current,
     playCorrectSE,
     playIncorrectSE,
-    stopBGM,
-    stopAllAudio,
-    setVolume: audio.setVolume,
+    playResultSE,
+    // setVolume: audio.setVolume, // 音量調整スライダーを削除したためコメントアウト
     setBGMEnabled,
     setSEEnabled,
     config: audio.config,

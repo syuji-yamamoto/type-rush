@@ -10,7 +10,7 @@ interface AudioConfig {
 interface UseAudioReturn {
   play: (src: string, type: AudioType, loop?: boolean) => void;
   stop: (type?: AudioType) => void;
-  setVolume: (volume: number) => void;
+  // setVolume: (volume: number) => void; // 音量調整スライダーを削除したためコメントアウト。TODO:将来再実装する場合は復活させる
   setEnabled: (type: AudioType, enabled: boolean) => void;
   config: {
     bgm: AudioConfig;
@@ -149,71 +149,51 @@ export const useAudio = (): UseAudioReturn => {
     }
   }, []);
 
-  const setVolume = useCallback((volume: number) => {
-    const clampedVolume = Math.max(0, Math.min(1, volume));
+  // 音量調整スライダーを削除したためコメントアウト。TODO:将来再実装する場合は復活させる
+  // const setVolume = useCallback((volume: number) => {
+  //   const clampedVolume = Math.max(0, Math.min(1, volume));
 
+  //   setConfig((prev) => ({
+  //     bgm: { ...prev.bgm, volume: clampedVolume },
+  //     se: { ...prev.se, volume: clampedVolume },
+  //   }));
+
+  //   // 現在再生中の音声の音量も更新
+  //   if (bgmRef.current) {
+  //     bgmRef.current.volume = clampedVolume;
+  //   }
+
+  //   seRefs.current.forEach((audio) => {
+  //     audio.volume = clampedVolume;
+  //   });
+  // }, []);
+
+  const setEnabled = useCallback((type: AudioType, enabled: boolean) => {
     setConfig((prev) => ({
-      bgm: { ...prev.bgm, volume: clampedVolume },
-      se: { ...prev.se, volume: clampedVolume },
+      ...prev,
+      [type]: { ...prev[type], enabled },
     }));
 
-    // 現在再生中の音声の音量も更新
-    if (bgmRef.current) {
-      bgmRef.current.volume = clampedVolume;
+    // BGMが無効化された場合は停止（lastBgmSrcRefなどはクリアしない）
+    if (type === "bgm" && !enabled && bgmRef.current) {
+      bgmRef.current.pause();
+      // 最後のBGM情報を保持するため、bgmRef.currentをnullにしない
+      // bgmRef.current = null;
     }
 
-    seRefs.current.forEach((audio) => {
-      audio.volume = clampedVolume;
-    });
+    // SEが無効化された場合は停止
+    if (type === "se" && !enabled) {
+      seRefs.current.forEach((audio) => {
+        audio.pause();
+      });
+      seRefs.current = [];
+    }
   }, []);
-
-  const setEnabled = useCallback(
-    (type: AudioType, enabled: boolean) => {
-      setConfig((prev) => ({
-        ...prev,
-        [type]: { ...prev[type], enabled },
-      }));
-
-      // BGMが無効化された場合は停止
-      if (type === "bgm" && !enabled && bgmRef.current) {
-        bgmRef.current.pause();
-        bgmRef.current = null;
-      }
-
-      // BGMが有効化された場合、前回再生していた音楽があれば再開
-      if (
-        type === "bgm" &&
-        enabled &&
-        lastBgmSrcRef.current &&
-        !bgmRef.current
-      ) {
-        const audio = new Audio(lastBgmSrcRef.current);
-        audio.loop = lastBgmLoopRef.current;
-        audio.volume = commonVolume;
-        audio.preload = "auto";
-
-        audio.addEventListener(
-          "canplaythrough",
-          () => {
-            audio.play().catch((error) => {
-              console.error("Failed to resume BGM:", error);
-            });
-          },
-          { once: true }
-        );
-
-        audio.load();
-
-        bgmRef.current = audio;
-      }
-    },
-    [commonVolume]
-  );
 
   return {
     play,
     stop,
-    setVolume,
+    // setVolume, // 音量調整スライダーを削除したためコメントアウト。TODO:将来再実装する場合は復活させる
     setEnabled,
     config,
   };

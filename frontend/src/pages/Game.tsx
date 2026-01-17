@@ -1,12 +1,11 @@
-import { useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { useAudioContext } from "../contexts/AudioContext";
 import { GameHeader } from "../components/game/GameHeader";
 import { GameSetup } from "../components/game/GameSetup";
 import { GameStats } from "../components/game/GameStats";
 import { TypingArea } from "../components/game/TypingArea";
 import { IMEWarning } from "../components/game/IMEWarning";
 import { GameResult } from "../components/game/GameResult";
+import { BGMManager } from "../components/BGMManager";
 import { useGameLogic } from "../hooks/useGameLogic";
 import { useScoreSave } from "../hooks/useScoreSave";
 import {
@@ -22,7 +21,6 @@ import {
  */
 function Game() {
   const { isAuthenticated } = useAuth();
-  const { playMenuBGM, stopBGM } = useAudioContext();
 
   // ゲームロジックのフック
   const { state, actions } = useGameLogic();
@@ -30,17 +28,6 @@ function Game() {
   // スコア保存のフック
   const { scoreSaved, isSaving, handleSaveScore, resetScoreSaveState } =
     useScoreSave();
-
-  /**
-   * ページマウント時の処理
-   * メニューBGMを再生し、アンマウント時に停止します
-   */
-  useEffect(() => {
-    playMenuBGM();
-    return () => {
-      stopBGM();
-    };
-  }, [playMenuBGM, stopBGM]);
 
   /**
    * スコアを保存する処理
@@ -79,6 +66,9 @@ function Game() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      {/* BGM自動管理 - ゲーム状態と難易度に基づいてBGMを自動切り替え */}
+      <BGMManager gameStatus={state.status} difficulty={state.difficulty} />
+
       <GameHeader />
 
       <div className="w-full max-w-2xl">
