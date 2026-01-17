@@ -81,27 +81,27 @@ class SampleTextSeeder extends Seeder
             ['language' => 'english', 'difficulty' => 'intermediate', 'text' => 'creativity is important in problem solving'],
             ['language' => 'english', 'difficulty' => 'intermediate', 'text' => 'daily practice leads to continuous improvement'],
 
-            // 上級（advanced）- 9 ~ 12単語 20問
-            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'machine learning algorithms require extensive training data to achieve accurate results'],
-            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'software architecture decisions have long term impacts on system maintainability'],
-            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'effective communication among team members is crucial for successful project completion'],
-            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'database optimization techniques can significantly improve application performance and user experience'],
-            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'understanding user needs is essential for designing intuitive and functional interfaces'],
-            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'continuous integration and deployment pipelines automate software delivery processes efficiently'],
-            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'security vulnerabilities must be addressed proactively to protect sensitive data from attacks'],
-            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'agile methodologies promote flexibility adaptability and rapid response to changing requirements'],
-            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'code reviews help maintain quality standards and spread knowledge across development teams'],
-            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'cloud infrastructure provides scalability reliability and cost efficiency for modern applications'],
-            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'data visualization tools transform complex information into easily understandable graphical representations'],
-            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'artificial intelligence is revolutionizing industries by automating complex decision making processes'],
-            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'version control systems enable teams to collaborate effectively and track code changes'],
-            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'responsive design ensures websites function properly across various devices and screen sizes'],
-            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'testing frameworks provide automated validation to ensure software reliability and correctness'],
-            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'microservices architecture allows independent development deployment and scaling of application components'],
-            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'performance monitoring tools help identify bottlenecks and optimize system resource utilization'],
-            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'encryption protocols protect confidential information during transmission across insecure networks'],
-            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'documentation practices facilitate knowledge transfer and reduce onboarding time for new developers'],
-            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'api design principles ensure consistent reliable and developer friendly interfaces for applications'],
+            // 上級（advanced）- 5 ~ 8単語 20問
+            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'we should practice typing every single day'],
+            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'the weather today is really very nice'],
+            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'learning new skills requires patience and practice'],
+            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'she enjoys reading books in the library'],
+            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'good communication is important for teamwork success'],
+            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'technology changes our lives in many ways'],
+            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'we need to finish this project soon'],
+            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'everyone should take care of their health'],
+            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'the internet helps us find information quickly'],
+            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'creative thinking is useful for solving problems'],
+            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'he studies computer science at the university'],
+            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'time management helps you achieve your goals'],
+            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'traveling abroad is a wonderful learning experience'],
+            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'regular exercise keeps your body and mind healthy'],
+            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'working together makes difficult tasks much easier'],
+            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'learning languages opens doors to new cultures'],
+            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'setting clear goals improves your daily productivity'],
+            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'daily practice leads to continuous skill improvement'],
+            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'taking breaks helps maintain focus and energy'],
+            ['language' => 'english', 'difficulty' => 'advanced', 'text' => 'asking questions is essential for better understanding'],
         ];
     }
 
@@ -135,47 +135,316 @@ class SampleTextSeeder extends Seeder
 
             // 中級（intermediate）- 5 ~ 7文字 20問
             ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'nekogasuki', 'text_variants' => ['nekogasuki'], 'display_text' => '猫が好き', 'reading' => 'ねこがすき'],
-            ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'soragaaoi', 'text_variants' => ['soragaaoi'], 'display_text' => '空が青い', 'reading' => 'そらがあおい'],
+            ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'soragaaoi', 'text_variants' => ['soragaaoi', 'solagaaoi'], 'display_text' => '空が青い', 'reading' => 'そらがあおい'],
             ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'honwoyomu', 'text_variants' => ['honwoyomu'], 'display_text' => '本を読む', 'reading' => 'ほんをよむ'],
-            ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'mizuwonomu', 'text_variants' => ['mizuwonomu'], 'display_text' => '水を飲む', 'reading' => 'みずをのむ'],
+            ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'mizuwonomu', 'text_variants' => ['mizuwonomu', 'miduwonomu'], 'display_text' => '水を飲む', 'reading' => 'みずをのむ'],
             ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'hanagakirei', 'text_variants' => ['hanagakirei'], 'display_text' => '花がきれい', 'reading' => 'はながきれい'],
             ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'gakkouniiku', 'text_variants' => ['gakkouniiku', 'gakkooniiku'], 'display_text' => '学校に行く', 'reading' => 'がっこうにいく'],
             ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'tomodachito', 'text_variants' => ['tomodachito', 'tomodatito'], 'display_text' => '友達と', 'reading' => 'ともだちと'],
-            ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'ongakukiku', 'text_variants' => ['ongakukiku'], 'display_text' => '音楽聴く', 'reading' => 'おんがくきく'],
+            ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'ongakukiku', 'text_variants' => ['ongakukiku', 'onngakukiku'], 'display_text' => '音楽聴く', 'reading' => 'おんがくきく'],
             ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'eigamiru', 'text_variants' => ['eigamiru'], 'display_text' => '映画見る', 'reading' => 'えいがみる'],
-            ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'ryourisuru', 'text_variants' => ['ryourisuru'], 'display_text' => '料理する', 'reading' => 'りょうりする'],
-            ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'undousuru', 'text_variants' => ['undousuru', 'undosuru'], 'display_text' => '運動する', 'reading' => 'うんどうする'],
-            ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'benkyousuru', 'text_variants' => ['benkyousuru', 'benkyosuru'], 'display_text' => '勉強する', 'reading' => 'べんきょうする'],
+            ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'ryourisuru', 'text_variants' => ['ryourisuru', 'ryorisuru'], 'display_text' => '料理する', 'reading' => 'りょうりする'],
+            ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'undousuru', 'text_variants' => ['undousuru', 'undosuru', 'unndousuru', 'unndosuru'], 'display_text' => '運動する', 'reading' => 'うんどうする'],
+            ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'benkyousuru', 'text_variants' => ['benkyousuru', 'benkyosuru', 'bennkyousuru', 'bennkyosuru'], 'display_text' => '勉強する', 'reading' => 'べんきょうする'],
             ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'asagohan', 'text_variants' => ['asagohan'], 'display_text' => '朝ごはん', 'reading' => 'あさごはん'],
             ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'hirugohan', 'text_variants' => ['hirugohan'], 'display_text' => '昼ごはん', 'reading' => 'ひるごはん'],
             ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'yorugohan', 'text_variants' => ['yorugohan'], 'display_text' => '夜ごはん', 'reading' => 'よるごはん'],
-            ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'tenkiyohou', 'text_variants' => ['tenkiyohou', 'tenkiyoho'], 'display_text' => '天気予報', 'reading' => 'てんきのよほう'],
-            ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'nihongogaku', 'text_variants' => ['nihongogaku'], 'display_text' => '日本語学', 'reading' => 'にほんごがく'],
-            ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'kouenaruku', 'text_variants' => ['kouenaruku', 'kouennaruku', 'koenaruku'], 'display_text' => '公園歩く', 'reading' => 'こうえんあるく'],
-            ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'denshanoru', 'text_variants' => ['denshanoru', 'densyanoru'], 'display_text' => '電車乗る', 'reading' => 'でんしゃのる'],
+            ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'tenkiyohou', 'text_variants' => ['tenkiyohou', 'tenkiyoho', 'tennkiyohou', 'tennkiyoho'], 'display_text' => '天気予報', 'reading' => 'てんきのよほう'],
+            ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'nihongogaku', 'text_variants' => ['nihongogaku', 'nihonngogaku'], 'display_text' => '日本語学', 'reading' => 'にほんごがく'],
+            ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'kouenaruku', 'text_variants' => ['kouenaruku', 'kouennaruku', 'koenaruku', 'koennaruku'], 'display_text' => '公園歩く', 'reading' => 'こうえんあるく'],
+            ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'denshanoru', 'text_variants' => ['denshanoru', 'densyanoru', 'dennshanoru', 'dennsyanoru'], 'display_text' => '電車乗る', 'reading' => 'でんしゃのる'],
             ['language' => 'japanese', 'difficulty' => 'intermediate', 'text' => 'kazokusuki', 'text_variants' => ['kazokusuki'], 'display_text' => '家族好き', 'reading' => 'かぞくすき'],
+            // 上級（advanced）- 5 ~ 8単語 20問
+            [
+                'language' => 'japanese',
+                'difficulty' => 'advanced',
+                'text' => 'mainichirenshuusurukotogadaiji',
+                'text_variants' => [
+                    'mainichirenshuusurukotogadaiji',
+                    'mainitirenshuusurukotogadaiji',
+                    'mainichirensyuusurukotogadaiji',
+                    'mainitirensyuusurukotogadaiji',
+                    'mainichirenshuusurukotogadaizi',
+                    'mainitirenshuusurukotogadaizi',
+                ],
+                'display_text' => '毎日練習することが大事',
+                'reading' => 'まいにちれんしゅうすることがだいじ'
+            ],
 
-            // 上級（advanced）- 8 ~ 10文字以上 20問
-            ['language' => 'japanese', 'difficulty' => 'advanced', 'text' => 'puroguraminguwobenkyousuru', 'text_variants' => ['puroguraminguwobenkyousuru', 'puroguraminnguwobenkyousuru', 'puroguraminguwobenkyosuru'], 'display_text' => 'プログラミングを勉強する', 'reading' => 'ぷろぐらみんぐをべんきょうする'],
-            ['language' => 'japanese', 'difficulty' => 'advanced', 'text' => 'mainichirenshuusurukotogadaiji', 'text_variants' => ['mainichirenshuusurukotogadaiji', 'mainitirensyuusurukotogadaizi'], 'display_text' => '毎日練習することが大事', 'reading' => 'まいにちれんしゅうすることがだいじ'],
-            ['language' => 'japanese', 'difficulty' => 'advanced', 'text' => 'taipingunosukuiruwotakameru', 'text_variants' => ['taipingunosukuiruwotakameru', 'taipingunosukuruwotakameru'], 'display_text' => 'タイピングのスキルを高める', 'reading' => 'たいぴんぐのすきるをたかめる'],
-            ['language' => 'japanese', 'difficulty' => 'advanced', 'text' => 'nihongonobunpouwomanabou', 'text_variants' => ['nihongonobunpouwomanabou', 'nihongonobunpouwomanabo'], 'display_text' => '日本語の文法を学ぼう', 'reading' => 'にほんごのぶんぽうをまなぼう'],
-            ['language' => 'japanese', 'difficulty' => 'advanced', 'text' => 'atarashiigijutsuwobenkyoushiteiru', 'text_variants' => ['atarashiigijutsuwobenkyoushiteiru', 'atarasiigijutuwobenkyousiteiru', 'atarashiigijutsuwobenkyoshiteiru'], 'display_text' => '新しい技術を勉強している', 'reading' => 'あたらしいぎじゅつをべんきょうしている'],
-            ['language' => 'japanese', 'difficulty' => 'advanced', 'text' => 'konpyuutaanosougouwokaihatsusuru', 'text_variants' => ['konpyuutaanosougouwokaihatsusuru', 'konpyu-ta-nosougouwokaihatsusuru'], 'display_text' => 'コンピューターの操作を開発する', 'reading' => 'こんぴゅーたーのそうさをかいはつする'],
-            ['language' => 'japanese', 'difficulty' => 'advanced', 'text' => 'deetabeesunijouhouwotouroku', 'text_variants' => ['deetabeesunijouhouwotouroku', 'de-tabe-sunijouhouwotouroku', 'deetabeesunijouhouwotoroku'], 'display_text' => 'データベースに情報を登録', 'reading' => 'でーたべーすにじょうほうをとうろく'],
-            ['language' => 'japanese', 'difficulty' => 'advanced', 'text' => 'yuuzaaintaafeesuwosekkeisuru', 'text_variants' => ['yuuzaaintaafeesuwosekkeisuru', 'yu-za-inta-fe-suwosekkeisuru'], 'display_text' => 'ユーザーインターフェースを設計する', 'reading' => 'ゆーざーいんたーふぇーすをせっけいする'],
-            ['language' => 'japanese', 'difficulty' => 'advanced', 'text' => 'tesutowojikkoushinagakakuninsuru', 'text_variants' => ['tesutowojikkoushinagakakuninsuru', 'tesutowozixtukousinagakakuninsuru'], 'display_text' => 'テストを実行しながら確認する', 'reading' => 'てすとをじっこうしながらかくにんする'],
-            ['language' => 'japanese', 'difficulty' => 'advanced', 'text' => 'koudomorebyuuwoteineinisusumerou', 'text_variants' => ['koudomorebyuuwoteineinisusumerou', 'ko-dorebyuuwoteineinisusumerou', 'koudomorebyu-woteineinisusumerou'], 'display_text' => 'コードレビューを丁寧に進めよう', 'reading' => 'こーどれびゅーをていねいにすすめよう'],
-            ['language' => 'japanese', 'difficulty' => 'advanced', 'text' => 'arugorizmunokouritsuwokousatsusuru', 'text_variants' => ['arugorizmunokouritsuwokousatsusuru', 'arugorizumunokouritsuwokousatsusuru'], 'display_text' => 'アルゴリズムの効率を考察する', 'reading' => 'あるごりずむのこうりつをこうさつする'],
-            ['language' => 'japanese', 'difficulty' => 'advanced', 'text' => 'sekuritinohoshouwojuushisuru', 'text_variants' => ['sekuritinohoshouwojuushisuru', 'sekyuritinohoshouwojuushisuru', 'sekuritinohosyouwojuusisuru'], 'display_text' => 'セキュリティの保証を重視する', 'reading' => 'せきゅりてぃのほしょうをじゅうしする'],
-            ['language' => 'japanese', 'difficulty' => 'advanced', 'text' => 'kurawudokonpyuuteinguwokatsuyou', 'text_variants' => ['kurawudokonpyuuteinguwokatsuyou', 'kurawudokonpyu-teinguwokatsuyou'], 'display_text' => 'クラウドコンピューティングを活用', 'reading' => 'くらうどこんぴゅーてぃんぐをかつよう'],
-            ['language' => 'japanese', 'difficulty' => 'advanced', 'text' => 'sofutoueanohinshitsuwokanrisuru', 'text_variants' => ['sofutoueanohinshitsuwokanrisuru', 'sofutoueanohinsituwokanrisuru'], 'display_text' => 'ソフトウェアの品質を管理する', 'reading' => 'そふとうぇあのひんしつをかんりする'],
-            ['language' => 'japanese', 'difficulty' => 'advanced', 'text' => 'ajiairuhouhoronidounyuushiteiru', 'text_variants' => ['ajiairuhouhoronidounyuushiteiru', 'ajiairuhouhoronidounyuusiteiru'], 'display_text' => 'アジャイル方法論に導入している', 'reading' => 'あじゃいるほうほうろんにどうにゅうしている'],
-            ['language' => 'japanese', 'difficulty' => 'advanced', 'text' => 'pafoomansunosaitakikatajuuyouda', 'text_variants' => ['pafoomansunosaitakikatajuuyouda', 'pafo-mansunosaitakikatajuuyouda', 'pafoomansunosaitakikatajuuyoda'], 'display_text' => 'パフォーマンスの最適化が重要だ', 'reading' => 'ぱふぉーまんすのさいてきかがじゅうようだ'],
-            ['language' => 'japanese', 'difficulty' => 'advanced', 'text' => 'apinosetteitoserubaawokaihatsusuru', 'text_variants' => ['apinosetteitoserubaawokaihatsusuru', 'apinosetteitorseruba-wokaihatsusuru'], 'display_text' => 'APIの設定とサーバーを開発する', 'reading' => 'えーぴーあいのせっていとさーばーをかいはつする'],
-            ['language' => 'japanese', 'difficulty' => 'advanced', 'text' => 'dokyumenteeshonwosakuseishiteikou', 'text_variants' => ['dokyumenteeshonwosakuseishiteikou', 'dokyumente-syonwosakuseisiteikou'], 'display_text' => 'ドキュメンテーションを作成していこう', 'reading' => 'どきゅめんてーしょんをさくせいしていこう'],
-            ['language' => 'japanese', 'difficulty' => 'advanced', 'text' => 'chiimudenokyouryokugataisetsudearu', 'text_variants' => ['chiimudenokyouryokugataisetsudearu', 'tiimudenokyouryokugataisetsudearu', 'chi-mudenokyouryokugataisetsudearu'], 'display_text' => 'チームでの協力が大切である', 'reading' => 'ちーむでのきょうりょくがたいせつである'],
-            ['language' => 'japanese', 'difficulty' => 'advanced', 'text' => 'jizokutekinakaizengajissennkoushi', 'text_variants' => ['jizokutekinakaizengajissennkoushi', 'jizokutekinakaizengajissenkousi', 'zizokutekinakaizengajissennkousi'], 'display_text' => '持続的な改善が実践向上', 'reading' => 'じぞくてきなかいぜんがじっせんこうじょう'],
+            [
+                'language' => 'japanese',
+                'difficulty' => 'advanced',
+                'text' => 'atarashiigijutsuwomanandeikou',
+                'text_variants' => [
+                    'atarashiigijutsuwomanandeikou',
+                    'atarasiigijutsuwomanandeikou',
+                    'atarashiigijutuwomanandeikou',
+                    'atarasiigijutuwomanandeikou',
+                    'atarashiigizutsuwomanandeikou',
+                    'atarasiigizutsuwomanandeikou',
+                    'atarashiigizutuwomanandeikou',
+                    'atarasiigizutuwomanandeikou',
+                ],
+                'display_text' => '新しい技術を学んでいこう',
+                'reading' => 'あたらしいぎじゅつをまなんでいこう'
+            ],
+            [
+                'language' => 'japanese',
+                'difficulty' => 'advanced',
+                'text' => 'kyounotenkinitotemoiihi',
+                'text_variants' => [
+                    'kyounotenkinitotemoiihi',
+                    'kyounotennkinitotemoiihi',
+                    'kyonotenkinitotemoiihi',
+                    'kyonotennkinitotemoiihi',
+                ],
+                'display_text' => '今日の天気にとても良い日',
+                'reading' => 'きょうのてんきにとてもいいひ'
+            ],
+            [
+                'language' => 'japanese',
+                'difficulty' => 'advanced',
+                'text' => 'toshokandemainichihonwoyomu',
+                'text_variants' => [
+                    'toshokandemainichihonwoyomu',
+                    'tosyokandemainichihonwoyomu',
+                    'toshokanndemainichihonwoyomu',
+                    'tosyokanndemainichihonwoyomu',
+                    'toshokandemainitihonwoyomu',
+                    'tosyokandemainitihonwoyomu',
+                    'toshokanndemainitihonwoyomu',
+                    'tosyokanndemainitihonwoyomu',
+                ],
+                'display_text' => '図書館で毎日本を読む',
+                'reading' => 'としょかんでまいにちほんをよむ'
+            ],
+            [
+                'language' => 'japanese',
+                'difficulty' => 'advanced',
+                'text' => 'chiimuwaakugaseikoukagi',
+                'text_variants' => [
+                    // 通常
+                    'chiimuwaakugaseikoukagi',
+                    'tiimuwaakugaseikoukagi',
+
+                    // ハイフンあり（外来語区切り）
+                    'chiimu-waaku-gaseikou-kagi',
+                    'tiimu-waaku-gaseikou-kagi',
+
+                    // ハイフンあり（前半のみ）
+                    'chiimu-waakugaseikoukagi',
+                    'tiimu-waakugaseikoukagi',
+                ],
+                'display_text' => 'チームワークが成功の鍵',
+                'reading' => 'ちーむわーくがせいこうのかぎ'
+            ],
+            [
+                'language' => 'japanese',
+                'difficulty' => 'advanced',
+                'text' => 'gijutsugaseikatsuwokaeru',
+                'text_variants' => [
+                    'gijutsugaseikatsuwokaeru',
+                    'gijutugaseikatsuwokaeru',
+                    'gizutsugaseikatsuwokaeru',
+                    'gizutugaseikatsuwokaeru',
+                ],
+                'display_text' => '技術が生活を変える',
+                'reading' => 'ぎじゅつがせいかつをかえる'
+            ],
+            [
+                'language' => 'japanese',
+                'difficulty' => 'advanced',
+                'text' => 'purojekutowosugunikanryousuru',
+                'text_variants' => [
+                    'purojekutowosugunikanryousuru',
+                    'purojekutowosugunikanryosuru',
+                    'purojekutowosugunikannryousuru',
+                ],
+                'display_text' => 'プロジェクトをすぐに完了する',
+                'reading' => 'ぷろじぇくとをすぐにかんりょうする'
+            ],
+            [
+                'language' => 'japanese',
+                'difficulty' => 'advanced',
+                'text' => 'minnahokenkounitsukerubekida',
+                'text_variants' => [
+                    'minnahokenkounitsukerubekida',
+                    'minnahokennkounitsukerubekida',
+                ],
+                'display_text' => 'みんな健康に気をつけるべきだ',
+                'reading' => 'みんなけんこうにきをつけるべきだ'
+            ],
+            [
+                'language' => 'japanese',
+                'difficulty' => 'advanced',
+                'text' => 'intanettodetokujouhouwoeru',
+                'text_variants' => [
+                    // 通常
+                    'intanettodetokujouhouwoeru',
+                    'intanettodetokujouhowoeru',
+                    'intanettodetokuzyouhouwoeru',
+                    'intanettodetokuzyouhowoeru',
+                    // ハイフンあり（外来語）
+                    'intanetto-detokujouhou-woeru',
+                    'intanetto-detokujouho-woeru',
+                    'intanetto-detokuzyouhou-woeru',
+                    'intanetto-detokuzyouho-woeru',
+                    // ハイフンあり（インターネットのみ）
+                    'intanetto-detokujouhouwoeru',
+                    'intanetto-detokuzyouhouwoeru',
+                ],
+                'display_text' => 'インターネットで情報を得る',
+                'reading' => 'いんたーねっとでじょうほうをえる'
+            ],
+
+            [
+                'language' => 'japanese',
+                'difficulty' => 'advanced',
+                'text' => 'souzouryokugamondaikaiketsuyuuyou',
+                'text_variants' => [
+                    'souzouryokugamondaikaiketsuyuuyou',
+                    'souzouryokugamondaikaiketsuyuyou',
+                    'souzouryokugamonndaikaiketsuyuuyou',
+                ],
+                'display_text' => '創造力が問題解決に有用',
+                'reading' => 'そうぞうりょくがもんだいかいけつにゆうよう'
+            ],
+            [
+                'language' => 'japanese',
+                'difficulty' => 'advanced',
+                'text' => 'daigakudekonpyuutaawomanabu',
+                'text_variants' => [
+                    // 通常
+                    'daigakudekonpyuutaawomanabu',
+                    'daigakudekomupyuutaawomanabu',
+                    // ハイフンあり（外来語）
+                    'daigakude-konpyuuta-wo-manabu',
+                    'daigakude-komupyuuta-wo-manabu',
+                    // ハイフンあり（コンピューターのみ）
+                    'daigakude-konpyuutaawomanabu',
+                    'daigakude-komupyuutaawomanabu',
+                ],
+                'display_text' => '大学でコンピューターを学ぶ',
+                'reading' => 'だいがくでこんぴゅーたーをまなぶ'
+            ],
+
+            [
+                'language' => 'japanese',
+                'difficulty' => 'advanced',
+                'text' => 'jikankanrigamokuhyoutassei',
+                'text_variants' => [
+                    'jikankanrigamokuhyoutassei',
+                    'jikannkanrigamokuhyoutassei',
+                    'jikankanrigamokuhyotassei',
+                ],
+                'display_text' => '時間管理が目標達成を助ける',
+                'reading' => 'じかんかんりがもくひょうたっせいをたすける'
+            ],
+            [
+                'language' => 'japanese',
+                'difficulty' => 'advanced',
+                'text' => 'ryokougasubarashiigakushuu',
+                'text_variants' => [
+                    'ryokougasubarashiigakushuu',
+                    'ryokogasubarashiigakushuu',
+                    'ryokougasubarasiigakushuu',
+                    'ryokogasubarasiigakushuu',
+                ],
+                'display_text' => '旅行がすばらしい学習体験',
+                'reading' => 'りょこうがすばらしいがくしゅうたいけん'
+            ],
+            [
+                'language' => 'japanese',
+                'difficulty' => 'advanced',
+                'text' => 'teikiundougakenkoumainten',
+                'text_variants' => [
+                    'teikiundougakenkoumainten',
+                    'teikiundogakenkoumainten',
+                    'teikiunndougakenkoumainten',
+                    'teikiunndogakenkoumainten',
+                ],
+                'display_text' => '定期運動が健康を維持する',
+                'reading' => 'ていきうんどうがけんこうをいじする'
+            ],
+            [
+                'language' => 'japanese',
+                'difficulty' => 'advanced',
+                'text' => 'kyouryokugakonnnannakototayasuku',
+                'text_variants' => [
+                    'kyouryokugakonnnannakototayasuku',
+                    'kyoryokugakonnnannakototayasuku',
+                    'kyouryokugakonnannakototayasuku',
+                ],
+                'display_text' => '協力が困難なことを易しく',
+                'reading' => 'きょうりょくがこんなんなことをやさしく'
+            ],
+            [
+                'language' => 'japanese',
+                'difficulty' => 'advanced',
+                'text' => 'gengogakushuugaatarashibunka',
+                'text_variants' => [
+                    'gengogakushuugaatarashibunka',
+                    'genngogakushuugaatarashibunka',
+                    'gengogakusyuugaatarashibunnka',
+                    'gengogakusyuugaatarashibunka',
+                ],
+                'display_text' => '言語学習が新しい文化を開く',
+                'reading' => 'げんごがくしゅうがあたらしいぶんかをひらく'
+            ],
+            [
+                'language' => 'japanese',
+                'difficulty' => 'advanced',
+                'text' => 'mokuhyousetteigaseisanseiwoageru',
+                'text_variants' => [
+                    'mokuhyousetteigaseisanseiwoageru',
+                    'mokuhyosetteigaseisanseiwoageru',
+                ],
+                'display_text' => '目標設定が生産性を上げる',
+                'reading' => 'もくひょうせっていがせいさんせいをあげる'
+            ],
+            [
+                'language' => 'japanese',
+                'difficulty' => 'advanced',
+                'text' => 'mainichirenshuugajoutatsu',
+                'text_variants' => [
+                    'mainichirenshuugajoutatsu',
+                    'mainitirenshuugajoutatsu',
+                    'mainichirensyuugajoutatsu',
+                    'mainitirensyuugajoutatsu',
+                    'mainichirenshuugazyoutatsu',
+                    'mainitirenshuugazyoutatsu',
+                    'mainichirensyuugazyoutatsu',
+                    'mainitirensyuugazyoutatsu',
+                ],
+                'display_text' => '毎日練習が上達につながる',
+                'reading' => 'まいにちれんしゅうがじょうたつにつながる'
+            ],
+            [
+                'language' => 'japanese',
+                'difficulty' => 'advanced',
+                'text' => 'kyuukeigasyuuchuuwotamotsu',
+                'text_variants' => [
+                    'kyuukeigasyuuchuuwotamotsu',
+                    'kyuukeigasyuutyuuwotamotsu',
+                    'kyukeigasyuuchuuwotamotsu',
+                    'kyukeigasyuutyuuwotamotsu',
+                ],
+                'display_text' => '休憩が集中を保つ',
+                'reading' => 'きゅうけいがしゅうちゅうをたもつ'
+            ],
+            [
+                'language' => 'japanese',
+                'difficulty' => 'advanced',
+                'text' => 'shitsumongayoriyoirikainijuuyou',
+                'text_variants' => [
+                    'shitsumongayoriyoirikainijuuyou',
+                    'sitsumongayoriyoirikainijuuyou',
+                    'shitsumongayoriyoirikainijyuyou',
+                    'shitsumongayoriyoirikainijuuyou',
+                ],
+                'display_text' => '質問がより良い理解に重要',
+                'reading' => 'しつもんがよりよいりかいにじゅうよう'
+            ],
         ];
     }
 }
