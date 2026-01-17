@@ -24,6 +24,8 @@ export interface GameState {
   difficulty: Difficulty;
   /** 現在のテキスト（ローマ字または英語） */
   currentText: string;
+  /** 現在のテキストのバリエーション一覧 */
+  currentTextVariants: string[];
   /** 現在の日本語テキスト */
   currentJapaneseText: JapaneseText | null;
   /** ユーザーの入力 */
@@ -81,6 +83,7 @@ export const useGameLogic = () => {
   const [language, setLanguage] = useState<Language>("japanese");
   const [difficulty, setDifficulty] = useState<Difficulty>("beginner");
   const [currentText, setCurrentText] = useState("");
+  const [currentTextVariants, setCurrentTextVariants] = useState<string[]>([]);
   const [currentJapaneseText, setCurrentJapaneseText] =
     useState<JapaneseText | null>(null);
   const [userInput, setUserInput] = useState("");
@@ -98,7 +101,7 @@ export const useGameLogic = () => {
   /**
    * APIからランダムなテキストを取得（使用済みテキストを除外）
    */
-  const fetchRandomText = async (): Promise<{ text: string; id?: number }> => {
+  const fetchRandomText = async (): Promise<{ text: string; textVariants: string[]; id?: number }> => {
     setIsLoading(true);
     try {
       const result = await fetchRandomTextWithFallback(
@@ -107,7 +110,7 @@ export const useGameLogic = () => {
         usedTextIds
       );
       setCurrentJapaneseText(result.japaneseText);
-      return { text: result.text, id: result.id };
+      return { text: result.text, textVariants: result.textVariants, id: result.id };
     } finally {
       setIsLoading(false);
     }
@@ -120,6 +123,7 @@ export const useGameLogic = () => {
     try {
       const result = await fetchRandomText();
       setCurrentText(result.text);
+      setCurrentTextVariants(result.textVariants);
 
       // テキストIDがある場合は使用済みリストに追加
       if (result.id !== undefined) {
@@ -132,6 +136,7 @@ export const useGameLogic = () => {
       const fallbackResult = getFallbackText(language);
       setCurrentJapaneseText(fallbackResult.japaneseText);
       setCurrentText(fallbackResult.text);
+      setCurrentTextVariants(fallbackResult.textVariants);
     }
   };
 
@@ -148,6 +153,7 @@ export const useGameLogic = () => {
     setWordsCompleted(0);
     setHasError(false);
     setUsedTextIds([]); // 使用済みテキストIDリストをリセット
+    setCurrentTextVariants([]); // テキストバリエーションをリセット
     setCurrentSessionId(`${Date.now()}-${Math.random()}`);
 
     await getNextText();
@@ -155,6 +161,21 @@ export const useGameLogic = () => {
     setTimeout(() => {
       inputRef.current?.focus();
     }, INPUT_FOCUS_DELAY_MS);
+  };
+
+  /**
+   * 入力されたテキストにマッチするバリエーションを検索
+   * ユーザーの入力に前方一致するバリエーションを返す
+   */
+  const findMatchingVariant = (input: string): string | null => {
+    if (currentTextVariants.length === 0) return null;
+    
+    // 入力に前方一致するバリエーションを探す
+    const matchingVariant = currentTextVariants.find(
+      (variant) => variant.startsWith(input)
+    );
+    
+    return matchingVariant || null;
   };
 
   /**
@@ -174,23 +195,27 @@ export const useGameLogic = () => {
         return;
       }
 
-      // 追加された文字の正誤判定
-      const addedChar = value[newLength - 1];
-      const expectedChar = currentText[newLength - 1];
-
-      setTotalChars((prev) => prev + 1);
-
-      if (addedChar === expectedChar) {
-        // 正解の場合のみ入力を受け付ける
+      // バリエーションを使った判定
+      const matchingVariant = findMatchingVariant(value);
+      
+      if (matchingVariant) {
+        // マッチするバリエーションがある場合
         setCorrectChars((prev) => prev + 1);
+        setTotalChars((prev) => prev + 1);
         setUserInput(value);
+        
+        // 表示テキストを動的に変更（マッチしたバリエーションに切り替え）
+        if (matchingVariant !== currentText) {
+          setCurrentText(matchingVariant);
+        }
+        
         // IME警告を消す
         if (imeWarning) {
           setImeWarning(false);
         }
 
         // 全文完成チェック
-        if (value === currentText) {
+        if (value === matchingVariant) {
           setWordsCompleted((prev) => prev + 1);
           setUserInput("");
           playCorrectSE();
@@ -201,7 +226,8 @@ export const useGameLogic = () => {
           }, 0);
         }
       } else {
-        // 不正解の場合
+        // マッチするバリエーションがない場合は不正解
+        setTotalChars((prev) => prev + 1);
         playIncorrectSE();
         setUserInput(value);
         setHasError(true);
@@ -212,6 +238,19 @@ export const useGameLogic = () => {
       // エラー状態をクリア
       if (hasError) {
         setHasError(false);
+      }
+      
+      // 削除後に再度マッチするバリエーションを探して表示テキストを更新
+      if (value.length > 0) {
+        const matchingVariant = findMatchingVariant(value);
+        if (matchingVariant && matchingVariant !== currentText) {
+          setCurrentText(matchingVariant);
+        }
+      } else {
+        // 入力が空の場合はデフォルトのテキスト（最初のバリエーション）に戻す
+        if (currentTextVariants.length > 0 && currentText !== currentTextVariants[0]) {
+          setCurrentText(currentTextVariants[0]);
+        }
       }
     }
   };
@@ -259,6 +298,7 @@ export const useGameLogic = () => {
     language,
     difficulty,
     currentText,
+    currentTextVariants,
     currentJapaneseText,
     userInput,
     timeLeft,

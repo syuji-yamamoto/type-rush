@@ -8,6 +8,7 @@ export type Language = "english" | "japanese";
 export interface SampleText {
   id: number;
   text: string;
+  text_variants: string[] | null;
   display_text: string | null;
   reading: string | null;
   language: Language;
@@ -22,6 +23,7 @@ export interface DifficultyOption {
 export interface GetRandomResponse {
   id: number;
   text: string;
+  text_variants: string[] | null;
   display_text: string | null;
   reading: string | null;
   language: Language;
@@ -39,6 +41,7 @@ export interface GetDifficultiesResponse {
 
 export interface FetchTextResult {
   text: string;
+  textVariants: string[];
   japaneseText: JapaneseText | null;
 }
 
@@ -100,6 +103,7 @@ const selectRandomFallbackText = (language: Language): FetchTextResult => {
       ];
     return {
       text: text.romaji,
+      textVariants: text.romajiVariants || [text.romaji],
       japaneseText: text,
     };
   } else {
@@ -109,6 +113,7 @@ const selectRandomFallbackText = (language: Language): FetchTextResult => {
       ];
     return {
       text,
+      textVariants: [text],
       japaneseText: null,
     };
   }
@@ -137,21 +142,25 @@ export const fetchRandomTextWithFallback = async (
       );
 
       if (availableText) {
+        const textVariants = availableText.text_variants || [availableText.text];
         if (language === "japanese") {
           const japaneseText: JapaneseText = {
             display: availableText.display_text || "",
             reading: availableText.reading || "",
             romaji: availableText.text,
+            romajiVariants: textVariants,
           };
           return {
             id: availableText.id,
             text: availableText.text,
+            textVariants,
             japaneseText,
           };
         } else {
           return {
             id: availableText.id,
             text: availableText.text,
+            textVariants,
             japaneseText: null,
           };
         }
@@ -160,22 +169,26 @@ export const fetchRandomTextWithFallback = async (
 
     // 除外IDがない場合、または除外後に該当するテキストがない場合は通常取得
     const response = await getRandomSampleText(language, difficulty);
+    const textVariants = response.text_variants || [response.text];
 
     if (language === "japanese") {
       const japaneseText: JapaneseText = {
         display: response.display_text || "",
         reading: response.reading || "",
         romaji: response.text,
+        romajiVariants: textVariants,
       };
       return {
         id: response.id,
         text: response.text,
+        textVariants,
         japaneseText,
       };
     } else {
       return {
         id: response.id,
         text: response.text,
+        textVariants,
         japaneseText: null,
       };
     }

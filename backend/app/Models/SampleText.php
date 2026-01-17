@@ -18,8 +18,18 @@ class SampleText extends Model
         'language',
         'difficulty',
         'text',
+        'text_variants',
         'display_text',
         'reading',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'text_variants' => 'array',
     ];
 
     /**
