@@ -91,22 +91,16 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
   // BGMシーンを設定
   const setBGMScene = useCallback(
     (scene: BGMScene) => {
-      // 同じシーンなら何もしない（早期return）
-      if (currentSceneRef.current === scene) {
-        return;
-      }
+      // 同じシーンなら何もしない
+      if (currentSceneRef.current === scene) return;
 
-      // シーンの更新
       currentSceneRef.current = scene;
       const bgmPath = getBGMPathForScene(scene);
 
       if (bgmPath) {
-        // BGMを再生（既に同じBGMが再生中の場合はuseAudio内で処理される）
         audio.play(bgmPath, "bgm", true);
-        // シーンが変わったらresult SE再生フラグをリセット
         resultSEPlayedRef.current = false;
       } else {
-        // サイレントシーンの場合はBGMを停止
         audio.stop("bgm");
       }
     },
@@ -158,9 +152,6 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
         if (bgmPath) {
           audio.play(bgmPath, "bgm", true);
         }
-      } else {
-        // BGMが無効化された場合は停止（useAudio内で処理済み）
-        // ここでは何もしない
       }
       bgmEnabledRef.current = currentEnabled;
     }
