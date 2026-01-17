@@ -19,13 +19,14 @@ export const AUDIO_PATHS = {
   se: {
     correct: new URL("../assets/se/correct.mp3", import.meta.url).href,
     incorrect: new URL("../assets/se/incorrect.mp3", import.meta.url).href,
+    result: new URL("../assets/se/result.mp3", import.meta.url).href,
   },
 } as const;
 
 interface AudioContextValue {
   playMenuBGM: () => void;
   playGameBGM: (difficulty: "beginner" | "intermediate" | "advanced") => void;
-  playResultBGM: () => void;
+  playFinishedSE: () => void;
   playCorrectSE: () => void;
   playIncorrectSE: () => void;
   stopBGM: () => void;
@@ -65,8 +66,8 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
     [audio]
   );
 
-  const playResultBGM = useCallback(() => {
-    audio.play(AUDIO_PATHS.bgm.result, "bgm", false);
+  const playFinishedSE = useCallback(() => {
+    audio.play(AUDIO_PATHS.se.result, "se");
   }, [audio]);
 
   const playCorrectSE = useCallback(() => {
@@ -102,7 +103,7 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
   const contextValue: AudioContextValue = {
     playMenuBGM,
     playGameBGM,
-    playResultBGM,
+    playFinishedSE,
     playCorrectSE,
     playIncorrectSE,
     stopBGM,

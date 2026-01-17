@@ -78,7 +78,7 @@ export const useGameLogic = () => {
     playCorrectSE,
     playIncorrectSE,
     stopBGM,
-    playResultBGM,
+    playFinishedSE,
   } = useAudioContext();
 
   // 状態管理
@@ -252,7 +252,7 @@ export const useGameLogic = () => {
         if (prev <= 1) {
           setGameState("finished");
           stopBGM();
-          playResultBGM();
+          playFinishedSE();
           return 0;
         }
         return prev - 1;
@@ -260,7 +260,7 @@ export const useGameLogic = () => {
     }, TIMER_INTERVAL_MS);
 
     return () => clearInterval(timer);
-  }, [gameState, stopBGM, playResultBGM]);
+  }, [gameState, stopBGM, playFinishedSE]);
 
   const state: GameState = {
     status: gameState,
