@@ -10,7 +10,7 @@ interface AudioConfig {
 interface UseAudioReturn {
   play: (src: string, type: AudioType, loop?: boolean) => void;
   stop: (type?: AudioType) => void;
-  setVolume: (volume: number) => void;
+  // setVolume: (volume: number) => void; // 音量調整スライダーを削除したためコメントアウト。TODO:将来再実装する場合は復活させる
   setEnabled: (type: AudioType, enabled: boolean) => void;
   config: {
     bgm: AudioConfig;
@@ -149,23 +149,24 @@ export const useAudio = (): UseAudioReturn => {
     }
   }, []);
 
-  const setVolume = useCallback((volume: number) => {
-    const clampedVolume = Math.max(0, Math.min(1, volume));
+  // 音量調整スライダーを削除したためコメントアウト。TODO:将来再実装する場合は復活させる
+  // const setVolume = useCallback((volume: number) => {
+  //   const clampedVolume = Math.max(0, Math.min(1, volume));
 
-    setConfig((prev) => ({
-      bgm: { ...prev.bgm, volume: clampedVolume },
-      se: { ...prev.se, volume: clampedVolume },
-    }));
+  //   setConfig((prev) => ({
+  //     bgm: { ...prev.bgm, volume: clampedVolume },
+  //     se: { ...prev.se, volume: clampedVolume },
+  //   }));
 
-    // 現在再生中の音声の音量も更新
-    if (bgmRef.current) {
-      bgmRef.current.volume = clampedVolume;
-    }
+  //   // 現在再生中の音声の音量も更新
+  //   if (bgmRef.current) {
+  //     bgmRef.current.volume = clampedVolume;
+  //   }
 
-    seRefs.current.forEach((audio) => {
-      audio.volume = clampedVolume;
-    });
-  }, []);
+  //   seRefs.current.forEach((audio) => {
+  //     audio.volume = clampedVolume;
+  //   });
+  // }, []);
 
   const setEnabled = useCallback((type: AudioType, enabled: boolean) => {
     setConfig((prev) => ({
@@ -173,10 +174,11 @@ export const useAudio = (): UseAudioReturn => {
       [type]: { ...prev[type], enabled },
     }));
 
-    // BGMが無効化された場合は停止
+    // BGMが無効化された場合は停止（lastBgmSrcRefなどはクリアしない）
     if (type === "bgm" && !enabled && bgmRef.current) {
       bgmRef.current.pause();
-      bgmRef.current = null;
+      // 最後のBGM情報を保持するため、bgmRef.currentをnullにしない
+      // bgmRef.current = null;
     }
 
     // SEが無効化された場合は停止
@@ -191,7 +193,7 @@ export const useAudio = (): UseAudioReturn => {
   return {
     play,
     stop,
-    setVolume,
+    // setVolume, // 音量調整スライダーを削除したためコメントアウト。TODO:将来再実装する場合は復活させる
     setEnabled,
     config,
   };

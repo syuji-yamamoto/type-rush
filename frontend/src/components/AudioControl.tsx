@@ -9,7 +9,7 @@ export const AudioControl: React.FC<AudioControlProps> = ({
   className = "",
 }) => {
   const {
-    setVolume: setAudioVolume,
+    // setVolume: setAudioVolume,
     setBGMEnabled,
     setSEEnabled,
     config,
@@ -37,7 +37,9 @@ export const AudioControl: React.FC<AudioControlProps> = ({
           SE: {config.se.enabled ? "🔊" : "🔇"}
         </button>
       </div>
-      <input
+      {/* 音量調整スライダーは削除しました */}
+      {/* TODO:音量調整スライダーの再実装 */}
+      {/* <input
         type="range"
         min="0"
         max="100"
@@ -50,7 +52,7 @@ export const AudioControl: React.FC<AudioControlProps> = ({
       />
       <span className="text-gray-300 text-sm w-8">
         {Math.round(config.bgm.volume * 100)}
-      </span>
+      </span> */}
     </div>
   );
 };

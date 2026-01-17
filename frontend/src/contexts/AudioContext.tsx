@@ -43,7 +43,7 @@ interface AudioContextValue {
   playResultSE: () => void;
 
   // 設定管理
-  setVolume: (volume: number) => void;
+  // setVolume: (volume: number) => void; // 音量調整スライダーを削除したためコメントアウト。TODO:将来再実装する場合は復活させる
   setBGMEnabled: (enabled: boolean) => void;
   setSEEnabled: (enabled: boolean) => void;
   config: {
@@ -68,7 +68,7 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
   const audio = useAudio();
   const currentSceneRef = useRef<BGMScene>("silent");
   const resultSEPlayedRef = useRef<boolean>(false);
-  const previousBGMEnabledRef = useRef<boolean>(audio.config.bgm.enabled);
+  const bgmEnabledRef = useRef<boolean>(audio.config.bgm.enabled);
 
   // BGMシーンに対応するオーディオパスを取得
   const getBGMPathForScene = useCallback((scene: BGMScene): string | null => {
@@ -145,17 +145,19 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
   // BGM有効/無効の切り替えを監視して、適切に再生/停止
   useEffect(() => {
     const currentEnabled = audio.config.bgm.enabled;
-    const previousEnabled = previousBGMEnabledRef.current;
+    const previousEnabled = bgmEnabledRef.current;
 
-    // BGMが有効化された場合、現在のシーンのBGMを再生
-    if (currentEnabled && !previousEnabled) {
-      const bgmPath = getBGMPathForScene(currentSceneRef.current);
-      if (bgmPath) {
-        audio.play(bgmPath, "bgm", true);
+    // BGMの有効状態が変わった時のみ処理
+    if (currentEnabled !== previousEnabled) {
+      if (currentEnabled) {
+        // BGMが有効化された場合、現在のシーンのBGMを再生
+        const bgmPath = getBGMPathForScene(currentSceneRef.current);
+        if (bgmPath) {
+          audio.play(bgmPath, "bgm", true);
+        }
       }
+      bgmEnabledRef.current = currentEnabled;
     }
-
-    previousBGMEnabledRef.current = currentEnabled;
   }, [audio, audio.config.bgm.enabled, getBGMPathForScene]);
 
   // コンポーネントのアンマウント時にオーディオをクリーンアップ
@@ -171,7 +173,7 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
     playCorrectSE,
     playIncorrectSE,
     playResultSE,
-    setVolume: audio.setVolume,
+    // setVolume: audio.setVolume, // 音量調整スライダーを削除したためコメントアウト
     setBGMEnabled,
     setSEEnabled,
     config: audio.config,
