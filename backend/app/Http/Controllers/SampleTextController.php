@@ -44,6 +44,7 @@ class SampleTextController extends Controller
         return response()->json([
             'id' => $text->id,
             'text' => $text->text,
+            'text_variants' => $text->text_variants ?? [$text->text],
             'display_text' => $text->display_text,
             'reading' => $text->reading,
             'language' => $text->language,
@@ -85,6 +86,7 @@ class SampleTextController extends Controller
                 return [
                     'id' => $text->id,
                     'text' => $text->text,
+                    'text_variants' => $text->text_variants ?? [$text->text],
                     'display_text' => $text->display_text,
                     'reading' => $text->reading,
                     'language' => $text->language,

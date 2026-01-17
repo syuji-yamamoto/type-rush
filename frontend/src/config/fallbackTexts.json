@@ -3,37 +3,44 @@
     {
       "display": "猫",
       "reading": "ねこ",
-      "romaji": "neko"
+      "romaji": "neko",
+      "romajiVariants": ["neko"]
     },
     {
       "display": "犬",
       "reading": "いぬ",
-      "romaji": "inu"
+      "romaji": "inu",
+      "romajiVariants": ["inu"]
     },
     {
       "display": "桜",
       "reading": "さくら",
-      "romaji": "sakura"
+      "romaji": "sakura",
+      "romajiVariants": ["sakura"]
     },
     {
       "display": "湖",
       "reading": "みずうみ",
-      "romaji": "mizuumi"
+      "romaji": "mizumi",
+      "romajiVariants": ["mizumi"]
     },
     {
       "display": "光",
       "reading": "ひかり",
-      "romaji": "hikari"
+      "romaji": "hikari",
+      "romajiVariants": ["hikari"]
     },
     {
       "display": "風",
       "reading": "かぜ",
-      "romaji": "kaze"
+      "romaji": "kaze",
+      "romajiVariants": ["kaze"]
     },
     {
       "display": "空",
       "reading": "そら",
-      "romaji": "sora"
+      "romaji": "sora",
+      "romajiVariants": ["sora"]
     }
   ],
   "english": [
