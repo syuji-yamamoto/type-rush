@@ -174,11 +174,14 @@ export const useAudio = (): UseAudioReturn => {
       [type]: { ...prev[type], enabled },
     }));
 
-    // BGMが無効化された場合は停止（lastBgmSrcRefなどはクリアしない）
+    // BGMが無効化された場合は完全に停止してクリア
     if (type === "bgm" && !enabled && bgmRef.current) {
       bgmRef.current.pause();
-      // 最後のBGM情報を保持するため、bgmRef.currentをnullにしない
-      // bgmRef.current = null;
+      bgmRef.current.currentTime = 0;
+      bgmRef.current = null;
+      // 最後のBGM情報もクリア（重複再生を防ぐため）
+      lastBgmSrcRef.current = null;
+      lastBgmLoopRef.current = false;
     }
 
     // SEが無効化された場合は停止
