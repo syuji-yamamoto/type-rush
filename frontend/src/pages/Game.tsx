@@ -79,7 +79,7 @@ function Game() {
             difficulty={state.difficulty}
             isLoading={state.isLoading}
             isAuthenticated={isAuthenticated}
-            availableDifficulties={getAvailableDifficulties(isAuthenticated)}
+            availableDifficulties={getAvailableDifficulties()}
             onLanguageChange={actions.setLanguage}
             onDifficultyChange={actions.setDifficulty}
             onStart={actions.startGame}

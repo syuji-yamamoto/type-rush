@@ -12,6 +12,7 @@ Route::get('/health', [HealthController::class, 'check']);
 // 認証不要のルート
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/guest-login', [AuthController::class, 'guestLogin']);
 
 // サンプルテキスト関連（難易度による制限あり - コントローラー側でチェック）
 Route::get('/sample-texts/random', [SampleTextController::class, 'getRandom']);

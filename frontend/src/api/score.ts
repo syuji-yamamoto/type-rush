@@ -25,7 +25,7 @@ export interface SaveScoreRequest {
   correct_chars: number;
   words_completed: number;
   language: Language;
-  difficulty: "advanced"; // 上級のみ
+  difficulty: Difficulty;
 }
 
 export interface SaveScoreResponse {
@@ -39,7 +39,7 @@ export interface ScoreHistoryResponse {
 }
 
 /**
- * スコアを保存（上級クリア時のみ）
+ * スコアを保存
  */
 export const saveScore = async (
   data: SaveScoreRequest

@@ -8,7 +8,6 @@ import { ApiError } from "../types/interfaces";
 
 function Register() {
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [error, setError] = useState("");
@@ -28,7 +27,7 @@ function Register() {
     setIsLoading(true);
 
     try {
-      await register(name, email, password, passwordConfirmation);
+      await register(name, password, passwordConfirmation);
       navigate("/");
     } catch (err) {
       const error = err as AxiosError<ApiError>;
@@ -68,27 +67,15 @@ function Register() {
           )}
 
           <div className="mb-6">
-            <label className="block text-gray-300 mb-2">ユーザー名</label>
+            <label className="block text-gray-300 mb-2">ニックネーム</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full bg-slate-700 text-white p-3 rounded-lg outline-none focus:ring-2 focus:ring-cyan-400"
-              placeholder="ユーザー名"
+              placeholder="ニックネーム（1〜20文字）"
               required
-              disabled={isLoading}
-            />
-          </div>
-
-          <div className="mb-6">
-            <label className="block text-gray-300 mb-2">メールアドレス</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-slate-700 text-white p-3 rounded-lg outline-none focus:ring-2 focus:ring-cyan-400"
-              placeholder="example@email.com"
-              required
+              maxLength={20}
               disabled={isLoading}
             />
           </div>
@@ -100,9 +87,9 @@ function Register() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-slate-700 text-white p-3 rounded-lg outline-none focus:ring-2 focus:ring-cyan-400"
-              placeholder="••••••••"
+              placeholder="4文字以上"
               required
-              minLength={8}
+              minLength={4}
               disabled={isLoading}
             />
           </div>
@@ -116,9 +103,9 @@ function Register() {
               value={passwordConfirmation}
               onChange={(e) => setPasswordConfirmation(e.target.value)}
               className="w-full bg-slate-700 text-white p-3 rounded-lg outline-none focus:ring-2 focus:ring-cyan-400"
-              placeholder="••••••••"
+              placeholder="もう一度入力"
               required
-              minLength={8}
+              minLength={4}
               disabled={isLoading}
             />
           </div>
@@ -131,7 +118,11 @@ function Register() {
             {isLoading ? "登録中..." : "登録"}
           </button>
 
-          <p className="text-gray-400 text-center mt-6">
+          <p className="text-gray-400 text-sm text-center mt-4">
+            メールアドレスは不要です。ニックネームとパスワードだけで登録できます。
+          </p>
+
+          <p className="text-gray-400 text-center mt-4">
             すでにアカウントをお持ちの方は{" "}
             <Link to="/login" className="text-cyan-400 hover:underline">
               ログイン

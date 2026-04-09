@@ -1,16 +1,30 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { AudioControl } from "../components/AudioControl";
 import { BGMManager } from "../components/BGMManager";
+import { Footer } from "../components/Footer";
 
 function Home() {
-  const { user, isAuthenticated, isLoading, logout } = useAuth();
+  const { user, isAuthenticated, isLoading, logout, guestLogin } = useAuth();
+  const [isGuestLoading, setIsGuestLoading] = useState(false);
 
   const handleLogout = async () => {
     try {
       await logout();
     } catch (error) {
       console.error("ログアウトに失敗しました", error);
+    }
+  };
+
+  const handleGuestLogin = async () => {
+    setIsGuestLoading(true);
+    try {
+      await guestLogin();
+    } catch (error) {
+      console.error("ゲストログインに失敗しました", error);
+    } finally {
+      setIsGuestLoading(false);
     }
   };
 
@@ -35,8 +49,11 @@ function Home() {
         <h1 className="text-6xl font-bold text-white mb-4">
           Type<span className="text-cyan-400">Rush</span>
         </h1>
-        <p className="text-gray-300 text-xl mb-12">
+        <p className="text-gray-300 text-xl mb-2">
           1分間のタイピングチャレンジ
+        </p>
+        <p className="text-gray-500 text-sm mb-12">
+          Portfolio Project — 個人情報の収集は行っておりません
         </p>
 
         <div className="space-y-4">
@@ -65,25 +82,48 @@ function Home() {
                 ログアウト
               </button>
             ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="text-gray-300 hover:text-white transition-colors"
+              <div className="space-y-3">
+                <button
+                  onClick={handleGuestLogin}
+                  disabled={isGuestLoading}
+                  className="block w-64 mx-auto bg-green-500 hover:bg-green-600 disabled:bg-green-700 disabled:cursor-not-allowed text-white font-bold py-3 px-8 rounded-lg transition-all transform hover:scale-105"
                 >
-                  ログイン
-                </Link>
-                <span className="text-gray-500">|</span>
-                <Link
-                  to="/register"
-                  className="text-gray-300 hover:text-white transition-colors"
-                >
-                  新規登録
-                </Link>
-              </>
+                  {isGuestLoading
+                    ? "ログイン中..."
+                    : "ゲストとしてプレイ"}
+                </button>
+                <div className="flex justify-center gap-4">
+                  <Link
+                    to="/login"
+                    className="text-gray-300 hover:text-white transition-colors"
+                  >
+                    ログイン
+                  </Link>
+                  <span className="text-gray-500">|</span>
+                  <Link
+                    to="/register"
+                    className="text-gray-300 hover:text-white transition-colors"
+                  >
+                    新規登録
+                  </Link>
+                </div>
+              </div>
             )}
+          </div>
+
+          {/* このアプリについてリンク */}
+          <div className="mt-8">
+            <Link
+              to="/about"
+              className="text-gray-500 hover:text-gray-300 text-sm transition-colors"
+            >
+              このアプリについて
+            </Link>
           </div>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }

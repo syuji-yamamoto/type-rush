@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import type { Difficulty, Language } from "../../api/sampleText";
 
 interface GameSetupProps {
@@ -17,7 +16,6 @@ export function GameSetup({
   language,
   difficulty,
   isLoading,
-  isAuthenticated,
   availableDifficulties,
   onLanguageChange,
   onDifficultyChange,
@@ -74,24 +72,13 @@ export function GameSetup({
                       ? "bg-gray-600 text-gray-300 hover:bg-gray-500"
                       : "bg-gray-700 text-gray-500 cursor-not-allowed"
                   }`}
-                  title={!isAvailable ? "ログインすると利用可能" : ""}
                 >
                   {getDifficultyLabel(diff)}
-                  {!isAvailable && " 🔒"}
                 </button>
               );
             }
           )}
         </div>
-        {!isAuthenticated && (
-          <p className="text-yellow-400 text-sm mt-4">
-            💡{" "}
-            <Link to="/login" className="underline hover:text-yellow-300">
-              ログイン
-            </Link>
-            すると中級・上級がプレイできます
-          </p>
-        )}
       </div>
 
       <button

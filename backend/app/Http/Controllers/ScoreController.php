@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class ScoreController extends Controller
 {
     /**
-     * スコアを保存（上級クリア時のみ）
+     * スコアを保存（全難易度で保存可能）
      *
      * @param Request $request
      * @return JsonResponse
@@ -22,7 +22,7 @@ class ScoreController extends Controller
             'correct_chars' => 'required|integer|min:0',
             'words_completed' => 'required|integer|min:0',
             'language' => 'required|in:english,japanese',
-            'difficulty' => 'required|in:advanced', // 上級のみ保存可能
+            'difficulty' => 'required|in:beginner,intermediate,advanced',
         ]);
 
         $score = Score::create([
