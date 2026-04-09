@@ -59,12 +59,12 @@ export function GameResult({
           </p>
         </div>
 
-        {/* スコア保存セクション（上級のみ） */}
-        {isAuthenticated && difficulty === "advanced" && (
+        {/* スコア保存セクション */}
+        {isAuthenticated && (
           <div className="mt-4 pt-4 border-t border-gray-700">
             {scoreSaved ? (
               <p className="text-green-400">
-                ✅ スコアを保存しました！
+                スコアを保存しました
                 <Link
                   to="/results"
                   className="underline ml-2 hover:text-green-300"
@@ -78,26 +78,18 @@ export function GameResult({
                 disabled={isSaving}
                 className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-6 rounded-lg transition-all disabled:opacity-50"
               >
-                {isSaving ? "保存中..." : "🏆 スコアを保存"}
+                {isSaving ? "保存中..." : "スコアを保存"}
               </button>
             )}
           </div>
         )}
-        {isAuthenticated && difficulty !== "advanced" && (
-          <div className="mt-4 pt-4 border-t border-gray-700">
-            <p className="text-yellow-400 text-sm">
-              💡 上級をクリアするとスコアを保存できます
-            </p>
-          </div>
-        )}
         {!isAuthenticated && (
           <div className="mt-4 pt-4 border-t border-gray-700">
-            <p className="text-yellow-400 text-sm">
-              💡{" "}
-              <Link to="/login" className="underline hover:text-yellow-300">
+            <p className="text-gray-400 text-sm">
+              <Link to="/login" className="text-cyan-400 hover:underline">
                 ログイン
               </Link>
-              して上級をクリアするとスコアを保存できます
+              するとスコアを保存できます
             </p>
           </div>
         )}

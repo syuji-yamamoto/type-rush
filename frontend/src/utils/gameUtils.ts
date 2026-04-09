@@ -75,14 +75,9 @@ export const calculateAccuracy = (
 
 /**
  * 利用可能な難易度を取得
- * @param isAuthenticated 認証状態
+ * 全難易度をログイン不要でプレイ可能
  * @returns 利用可能な難易度の配列
  */
-export const getAvailableDifficulties = (
-  isAuthenticated: boolean
-): Difficulty[] => {
-  if (isAuthenticated) {
-    return ["beginner", "intermediate", "advanced"];
-  }
-  return ["beginner"];
+export const getAvailableDifficulties = (): Difficulty[] => {
+  return ["beginner", "intermediate", "advanced"];
 };

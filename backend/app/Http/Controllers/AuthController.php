@@ -11,27 +11,26 @@ use Illuminate\Validation\ValidationException;
 class AuthController extends Controller
 {
     /**
-     * 新規ユーザー登録
+     * 新規ユーザー登録（ニックネーム認証）
      */
     public function register(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+            'name' => 'required|string|min:1|max:20|unique:users',
+            'password' => 'required|string|min:4|confirmed',
         ], [
-            'name.required' => 'ユーザー名は必須です',
-            'email.required' => 'メールアドレスは必須です',
-            'email.email' => '有効なメールアドレスを入力してください',
-            'email.unique' => 'このメールアドレスは既に使用されています',
+            'name.required' => 'ニックネームは必須です',
+            'name.min' => 'ニックネームは1文字以上で入力してください',
+            'name.max' => 'ニックネームは20文字以内で入力してください',
+            'name.unique' => 'このニックネームは既に使用されています',
             'password.required' => 'パスワードは必須です',
-            'password.min' => 'パスワードは8文字以上で入力してください',
+            'password.min' => 'パスワードは4文字以上で入力してください',
             'password.confirmed' => 'パスワードが一致しません',
         ]);
 
         $user = User::create([
             'name' => $request->name,
-            'email' => $request->email,
+            'email' => $request->name . '@typerush.local',
             'password' => Hash::make($request->password),
         ]);
 
@@ -42,33 +41,56 @@ class AuthController extends Controller
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
-                'email' => $user->email,
             ],
             'token' => $token,
         ], 201);
     }
 
     /**
-     * ログイン
+     * ゲストログイン（ワンクリック）
+     */
+    public function guestLogin()
+    {
+        $guestId = 'guest_' . time() . '_' . substr(str_shuffle('abcdefghijklmnopqrstuvwxyz0123456789'), 0, 6);
+
+        $user = User::create([
+            'name' => $guestId,
+            'email' => $guestId . '@guest.typerush.local',
+            'password' => Hash::make($guestId),
+        ]);
+
+        $token = $user->createToken('auth-token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'ゲストとしてログインしました',
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+            ],
+            'token' => $token,
+        ], 201);
+    }
+
+    /**
+     * ログイン（ニックネーム認証）
      */
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|string|email',
+            'name' => 'required|string',
             'password' => 'required|string',
         ], [
-            'email.required' => 'メールアドレスは必須です',
-            'email.email' => '有効なメールアドレスを入力してください',
+            'name.required' => 'ニックネームは必須です',
             'password.required' => 'パスワードは必須です',
         ]);
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        $user = User::where('name', $request->name)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
-                'email' => ['メールアドレスまたはパスワードが正しくありません'],
+                'name' => ['ニックネームまたはパスワードが正しくありません'],
             ]);
         }
-
-        $user = User::where('email', $request->email)->firstOrFail();
 
         // 既存のトークンを削除
         $user->tokens()->delete();
@@ -80,7 +102,6 @@ class AuthController extends Controller
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
-                'email' => $user->email,
             ],
             'token' => $token,
         ]);
@@ -107,7 +128,6 @@ class AuthController extends Controller
             'user' => [
                 'id' => $request->user()->id,
                 'name' => $request->user()->name,
-                'email' => $request->user()->email,
             ],
         ]);
     }

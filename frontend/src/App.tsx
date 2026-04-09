@@ -6,6 +6,7 @@ import Game from "./pages/Game";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Results from "./pages/Results";
+import About from "./pages/About";
 import { useBasicAuth } from "./hooks/useBasicAuth";
 import { BasicAuthDialog } from "./components/BasicAuthDialog";
 
@@ -27,6 +28,7 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/results" element={<Results />} />
+                <Route path="/about" element={<About />} />
               </Routes>
             )}
           </div>

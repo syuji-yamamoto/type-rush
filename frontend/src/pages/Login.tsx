@@ -7,7 +7,7 @@ import { AxiosError } from "axios";
 import { ApiError } from "../types/interfaces";
 
 function Login() {
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -20,7 +20,7 @@ function Login() {
     setIsLoading(true);
 
     try {
-      await login(email, password);
+      await login(name, password);
       navigate("/");
     } catch (err) {
       const error = err as AxiosError<ApiError>;
@@ -60,13 +60,13 @@ function Login() {
           )}
 
           <div className="mb-6">
-            <label className="block text-gray-300 mb-2">メールアドレス</label>
+            <label className="block text-gray-300 mb-2">ニックネーム</label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               className="w-full bg-slate-700 text-white p-3 rounded-lg outline-none focus:ring-2 focus:ring-cyan-400"
-              placeholder="example@email.com"
+              placeholder="ニックネーム"
               required
               disabled={isLoading}
             />

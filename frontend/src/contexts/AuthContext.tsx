@@ -9,6 +9,7 @@ import { User } from "../types/interfaces";
 import {
   login as apiLogin,
   register as apiRegister,
+  guestLogin as apiGuestLogin,
   logout as apiLogout,
   getUser,
 } from "../api/auth";
@@ -17,13 +18,13 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (name: string, password: string) => Promise<void>;
   register: (
     name: string,
-    email: string,
     password: string,
     passwordConfirmation: string
   ) => Promise<void>;
+  guestLogin: () => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -49,24 +50,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     initAuth();
   }, []);
 
-  const login = async (email: string, password: string) => {
-    const response = await apiLogin(email, password);
+  const login = async (name: string, password: string) => {
+    const response = await apiLogin(name, password);
     localStorage.setItem("auth_token", response.token);
     setUser(response.user);
   };
 
   const register = async (
     name: string,
-    email: string,
     password: string,
     passwordConfirmation: string
   ) => {
-    const response = await apiRegister(
-      name,
-      email,
-      password,
-      passwordConfirmation
-    );
+    const response = await apiRegister(name, password, passwordConfirmation);
+    localStorage.setItem("auth_token", response.token);
+    setUser(response.user);
+  };
+
+  const guestLogin = async () => {
+    const response = await apiGuestLogin();
     localStorage.setItem("auth_token", response.token);
     setUser(response.user);
   };
@@ -88,6 +89,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isAuthenticated: !!user,
         login,
         register,
+        guestLogin,
         logout,
       }}
     >

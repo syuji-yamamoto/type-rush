@@ -41,7 +41,7 @@ export const useScoreSave = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   /**
-   * スコアを保存（上級クリア時のみ）
+   * スコアを保存（ログイン済みなら全難易度で保存可能）
    * @param params スコア情報
    * @param conditions 保存条件
    */
@@ -49,15 +49,10 @@ export const useScoreSave = () => {
     params: SaveScoreParams,
     conditions: SaveScoreConditions
   ) => {
-    const { isAuthenticated, difficulty, currentSessionId } = conditions;
+    const { isAuthenticated, currentSessionId } = conditions;
 
     // 保存条件のチェック
-    if (
-      !isAuthenticated ||
-      difficulty !== "advanced" ||
-      scoreSaved ||
-      !currentSessionId
-    ) {
+    if (!isAuthenticated || scoreSaved || !currentSessionId) {
       return;
     }
 
@@ -69,7 +64,7 @@ export const useScoreSave = () => {
         correct_chars: params.correctChars,
         words_completed: params.wordsCompleted,
         language: params.language,
-        difficulty: "advanced",
+        difficulty: params.difficulty,
       });
       setScoreSaved(true);
     } catch (error) {
