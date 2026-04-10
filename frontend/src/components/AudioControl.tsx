@@ -1,4 +1,5 @@
 import React from "react";
+import { Volume2, VolumeX, Music, Music2 } from "lucide-react";
 import { useAudioContext } from "../contexts/AudioContext";
 
 interface AudioControlProps {
@@ -8,51 +9,44 @@ interface AudioControlProps {
 export const AudioControl: React.FC<AudioControlProps> = ({
   className = "",
 }) => {
-  const {
-    // setVolume: setAudioVolume,
-    setBGMEnabled,
-    setSEEnabled,
-    config,
-  } = useAudioContext();
+  const { setBGMEnabled, setSEEnabled, config } = useAudioContext();
 
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => setBGMEnabled(!config.bgm.enabled)}
-          className="text-gray-300 hover:text-white text-sm"
-          aria-label={
-            config.bgm.enabled ? "BGMをオフにする" : "BGMをオンにする"
-          }
-          title={config.bgm.enabled ? "BGMをオフ" : "BGMをオン"}
-        >
-          BGM: {config.bgm.enabled ? "🔊" : "🔇"}
-        </button>
-        <button
-          onClick={() => setSEEnabled(!config.se.enabled)}
-          className="text-gray-300 hover:text-white text-sm"
-          aria-label={config.se.enabled ? "SEをオフにする" : "SEをオンにする"}
-          title={config.se.enabled ? "SEをオフ" : "SEをオン"}
-        >
-          SE: {config.se.enabled ? "🔊" : "🔇"}
-        </button>
-      </div>
-      {/* 音量調整スライダーは削除しました */}
-      {/* TODO:音量調整スライダーの再実装 */}
-      {/* <input
-        type="range"
-        min="0"
-        max="100"
-        value={config.bgm.volume * 100}
-        onChange={(e) => setAudioVolume(Number(e.target.value) / 100)}
-        className="w-24"
-        aria-label="音量調節"
-        aria-valuetext={`音量 ${Math.round(config.bgm.volume * 100)}パーセント`}
-        title="音量調節"
-      />
-      <span className="text-gray-300 text-sm w-8">
-        {Math.round(config.bgm.volume * 100)}
-      </span> */}
+    <div className={`flex items-center gap-1 ${className}`}>
+      <button
+        onClick={() => setBGMEnabled(!config.bgm.enabled)}
+        className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-sm transition-colors ${
+          config.bgm.enabled
+            ? "text-cyan-400 hover:text-cyan-300 bg-slate-700/50"
+            : "text-gray-500 hover:text-gray-400 bg-slate-800/50"
+        }`}
+        aria-label={config.bgm.enabled ? "BGMをオフにする" : "BGMをオンにする"}
+        title={config.bgm.enabled ? "BGMをオフ" : "BGMをオン"}
+      >
+        {config.bgm.enabled ? (
+          <Music className="w-4 h-4" />
+        ) : (
+          <Music2 className="w-4 h-4" />
+        )}
+        <span className="text-xs">BGM</span>
+      </button>
+      <button
+        onClick={() => setSEEnabled(!config.se.enabled)}
+        className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-sm transition-colors ${
+          config.se.enabled
+            ? "text-cyan-400 hover:text-cyan-300 bg-slate-700/50"
+            : "text-gray-500 hover:text-gray-400 bg-slate-800/50"
+        }`}
+        aria-label={config.se.enabled ? "SEをオフにする" : "SEをオンにする"}
+        title={config.se.enabled ? "SEをオフ" : "SEをオン"}
+      >
+        {config.se.enabled ? (
+          <Volume2 className="w-4 h-4" />
+        ) : (
+          <VolumeX className="w-4 h-4" />
+        )}
+        <span className="text-xs">SE</span>
+      </button>
     </div>
   );
 };
