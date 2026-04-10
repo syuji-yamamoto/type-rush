@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { Trophy, TrendingUp, Target, Hash, ArrowLeft } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { AudioControl } from "../components/AudioControl";
-import { BGMManager } from "../components/BGMManager";
 import {
   getScoreStats,
   getScoreHistory,
@@ -118,8 +117,6 @@ function Results() {
 
   return (
     <div className="min-h-screen p-4">
-      <BGMManager />
-
       {/* ヘッダー */}
       <div className="flex justify-between items-center mb-8">
         <Link

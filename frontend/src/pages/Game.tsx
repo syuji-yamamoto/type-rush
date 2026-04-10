@@ -6,7 +6,6 @@ import { TypingArea } from "../components/game/TypingArea";
 import { ComboDisplay } from "../components/game/ComboDisplay";
 import { IMEWarning } from "../components/game/IMEWarning";
 import { GameResult } from "../components/game/GameResult";
-import { BGMManager } from "../components/BGMManager";
 import { useGameLogic } from "../hooks/useGameLogic";
 import { useScoreSave } from "../hooks/useScoreSave";
 import {
@@ -54,7 +53,6 @@ function Game() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
-      <BGMManager gameStatus={state.status} difficulty={state.difficulty} />
       <GameHeader />
 
       <div className="w-full max-w-3xl">

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useAudioContext } from "../contexts/AudioContext";
+import type { BGMScene } from "../config/audioConfig";
 import type { Difficulty, Language, JapaneseText } from "../types/types";
 import { getRandomText } from "../data";
 import {
@@ -74,11 +75,10 @@ export interface GameActions {
 
 /**
  * ゲームのメインロジックを管理するカスタムフック
- * ゲームの状態管理、タイマー、テキスト取得、入力処理などを提供します
- * BGM管理はBGMManagerコンポーネントが担当するため、このフックではSE再生のみを処理します
+ * ゲームの状態管理、タイマー、テキスト取得、入力処理、BGMシーン管理を提供します
  */
 export const useGameLogic = () => {
-  const { playCorrectSE, playIncorrectSE } = useAudioContext();
+  const { playCorrectSE, playIncorrectSE, playResultSE, resetResultSEPlayed, setBGMScene } = useAudioContext();
 
   // 状態管理
   const [gameState, setGameState] = useState<GameState["status"]>("ready");
@@ -118,7 +118,6 @@ export const useGameLogic = () => {
 
   /**
    * ゲームを開始
-   * BGMの切り替えはBGMManagerが状態変化を検知して自動的に行います
    */
   const startGame = () => {
     setGameState("playing");
@@ -134,6 +133,7 @@ export const useGameLogic = () => {
     setUsedTextIds([]); // 使用済みテキストIDリストをリセット
     setCurrentTextVariants([]); // テキストバリエーションをリセット
     setCurrentSessionId(`${Date.now()}-${Math.random()}`);
+    resetResultSEPlayed();
 
     getNextText();
     // レンダリング後に確実にフォーカスを当てる
@@ -261,8 +261,22 @@ export const useGameLogic = () => {
   };
 
   /**
+   * BGMシーン管理
+   * ゲーム状態に応じてBGMシーンを切り替え
+   */
+  useEffect(() => {
+    if (gameState === "ready") {
+      setBGMScene("menu");
+    } else if (gameState === "playing") {
+      setBGMScene(`game-${difficulty}` as BGMScene);
+    } else if (gameState === "finished") {
+      setBGMScene("silent");
+      playResultSE();
+    }
+  }, [gameState, difficulty, setBGMScene, playResultSE]);
+
+  /**
    * タイマー処理
-   * ゲーム終了時のBGM停止と終了SE再生はBGMManagerが担当
    */
   useEffect(() => {
     if (gameState !== "playing") return;

@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { AudioControl } from "../components/AudioControl";
-import { BGMManager } from "../components/BGMManager";
 import { Footer } from "../components/Footer";
 
 function Home() {
@@ -30,9 +29,6 @@ function Home() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
-      {/* BGM自動管理 */}
-      <BGMManager />
-
       {/* 音量コントロール */}
       <div className="absolute top-4 right-4">
         <AudioControl />
