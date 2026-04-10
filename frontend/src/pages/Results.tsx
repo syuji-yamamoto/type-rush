@@ -97,7 +97,7 @@ function Results() {
           <div className="bg-slate-800 rounded-lg p-8">
             <p className="text-gray-400 text-xl mb-4">まだスコアがありません</p>
             <p className="text-gray-500 mb-6">
-              上級モードをクリアするとスコアが保存されます
+              ゲームをプレイしてスコアを保存しましょう
             </p>
             <Link
               to="/game"
@@ -133,15 +133,15 @@ function Results() {
         {stats && (
           <div className="grid grid-cols-4 gap-4 mb-8">
             <div className="bg-slate-800 rounded-lg p-6 text-center">
-              <p className="text-gray-400 mb-2">最高WPM</p>
+              <p className="text-gray-400 mb-2">最高KPM</p>
               <p className="text-4xl font-bold text-cyan-400">
-                {stats.best_wpm}
+                {stats.best_kpm}
               </p>
             </div>
             <div className="bg-slate-800 rounded-lg p-6 text-center">
-              <p className="text-gray-400 mb-2">平均WPM</p>
+              <p className="text-gray-400 mb-2">平均KPM</p>
               <p className="text-4xl font-bold text-purple-400">
-                {stats.avg_wpm}
+                {stats.avg_kpm}
               </p>
             </div>
             <div className="bg-slate-800 rounded-lg p-6 text-center">
@@ -165,7 +165,7 @@ function Results() {
             <thead className="bg-slate-700">
               <tr>
                 <th className="text-left text-gray-300 p-4">日時</th>
-                <th className="text-center text-gray-300 p-4">WPM</th>
+                <th className="text-center text-gray-300 p-4">KPM</th>
                 <th className="text-center text-gray-300 p-4">精度</th>
                 <th className="text-center text-gray-300 p-4">言語</th>
               </tr>
@@ -177,12 +177,12 @@ function Results() {
                   <td className="text-center p-4">
                     <span
                       className={`font-bold ${
-                        stats && score.wpm === stats.best_wpm
+                        stats && score.kpm === stats.best_kpm
                           ? "text-cyan-400"
                           : "text-white"
                       }`}
                     >
-                      {score.wpm}
+                      {score.kpm}
                     </span>
                   </td>
                   <td className="text-center p-4">

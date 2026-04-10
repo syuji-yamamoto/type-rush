@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
 import type { Difficulty, Language } from "../../types/types";
+import { calculateWPMEquivalent } from "../../utils/gameUtils";
 
 interface GameResultProps {
-  wpm: number;
+  kpm: number;
   accuracy: number;
   wordsCompleted: number;
   correctChars: number;
@@ -17,7 +18,7 @@ interface GameResultProps {
 }
 
 export function GameResult({
-  wpm,
+  kpm,
   accuracy,
   wordsCompleted,
   correctChars,
@@ -36,8 +37,11 @@ export function GameResult({
       <div className="bg-slate-800 rounded-lg p-8 mb-8">
         <div className="grid grid-cols-2 gap-6 text-left">
           <div>
-            <p className="text-gray-400">WPM</p>
-            <p className="text-4xl font-bold text-cyan-400">{wpm}</p>
+            <p className="text-gray-400">KPM</p>
+            <p className="text-4xl font-bold text-cyan-400">{kpm}</p>
+            <p className="text-gray-500 text-sm mt-1">
+              WPM換算: {calculateWPMEquivalent(kpm)}
+            </p>
           </div>
           <div>
             <p className="text-gray-400">精度</p>

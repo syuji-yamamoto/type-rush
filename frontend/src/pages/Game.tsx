@@ -10,7 +10,7 @@ import { useGameLogic } from "../hooks/useGameLogic";
 import { useScoreSave } from "../hooks/useScoreSave";
 import {
   getDifficultyLabel,
-  calculateWPM,
+  calculateKPM,
   calculateAccuracy,
   getAvailableDifficulties,
 } from "../utils/gameUtils";
@@ -36,7 +36,7 @@ function Game() {
     try {
       await handleSaveScore(
         {
-          wpm: calculateWPM(state.correctChars, state.timeLeft, state.language),
+          kpm: calculateKPM(state.correctChars, state.timeLeft),
           accuracy: calculateAccuracy(state.correctChars, state.totalChars),
           correctChars: state.correctChars,
           wordsCompleted: state.wordsCompleted,
@@ -92,11 +92,7 @@ function Game() {
           <div>
             <GameStats
               timeLeft={state.timeLeft}
-              wpm={calculateWPM(
-                state.correctChars,
-                state.timeLeft,
-                state.language
-              )}
+              kpm={calculateKPM(state.correctChars, state.timeLeft)}
               wordsCompleted={state.wordsCompleted}
               difficulty={state.difficulty}
               getDifficultyLabel={getDifficultyLabel}
@@ -135,11 +131,7 @@ function Game() {
         {/* ゲーム結果画面 */}
         {state.status === "finished" && (
           <GameResult
-            wpm={calculateWPM(
-              state.correctChars,
-              state.timeLeft,
-              state.language
-            )}
+            kpm={calculateKPM(state.correctChars, state.timeLeft)}
             accuracy={calculateAccuracy(state.correctChars, state.totalChars)}
             wordsCompleted={state.wordsCompleted}
             correctChars={state.correctChars}
