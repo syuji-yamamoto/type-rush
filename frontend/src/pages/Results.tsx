@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Trophy, TrendingUp, Target, Hash, ArrowLeft } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { AudioControl } from "../components/AudioControl";
 import { BGMManager } from "../components/BGMManager";
@@ -19,7 +20,6 @@ function Results() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // 認証チェック
     if (!authLoading && !isAuthenticated) {
       navigate("/login");
       return;
@@ -47,7 +47,7 @@ function Results() {
 
     fetchData();
   }, [isAuthenticated, authLoading, navigate]);
-  // 認証確認中
+
   if (authLoading || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -56,18 +56,20 @@ function Results() {
     );
   }
 
-  // 未認証時はリダイレクト
   if (!isAuthenticated) {
     return null;
   }
 
-  // エラー表示
   if (error) {
     return (
       <div className="min-h-screen p-4">
         <div className="mb-8">
-          <Link to="/" className="text-gray-300 hover:text-white">
-            ← ホームに戻る
+          <Link
+            to="/"
+            className="flex items-center gap-1 text-gray-300 hover:text-white"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            ホームに戻る
           </Link>
         </div>
         <div className="max-w-4xl mx-auto text-center">
@@ -83,13 +85,16 @@ function Results() {
     );
   }
 
-  // スコアがない場合
   if (scores.length === 0) {
     return (
       <div className="min-h-screen p-4">
         <div className="mb-8">
-          <Link to="/" className="text-gray-300 hover:text-white">
-            ← ホームに戻る
+          <Link
+            to="/"
+            className="flex items-center gap-1 text-gray-300 hover:text-white"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            ホームに戻る
           </Link>
         </div>
         <div className="max-w-4xl mx-auto text-center">
@@ -113,13 +118,16 @@ function Results() {
 
   return (
     <div className="min-h-screen p-4">
-      {/* BGM自動管理 */}
       <BGMManager />
 
       {/* ヘッダー */}
       <div className="flex justify-between items-center mb-8">
-        <Link to="/" className="text-gray-300 hover:text-white">
-          ← ホームに戻る
+        <Link
+          to="/"
+          className="flex items-center gap-1 text-gray-300 hover:text-white"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          ホームに戻る
         </Link>
         <AudioControl />
       </div>
@@ -133,25 +141,37 @@ function Results() {
         {stats && (
           <div className="grid grid-cols-4 gap-4 mb-8">
             <div className="bg-slate-800 rounded-lg p-6 text-center">
-              <p className="text-gray-400 mb-2">最高KPM</p>
+              <div className="flex items-center justify-center gap-1.5 text-gray-400 mb-2">
+                <Trophy className="w-4 h-4 text-cyan-400" />
+                <span>最高KPM</span>
+              </div>
               <p className="text-4xl font-bold text-cyan-400">
                 {stats.best_kpm}
               </p>
             </div>
             <div className="bg-slate-800 rounded-lg p-6 text-center">
-              <p className="text-gray-400 mb-2">平均KPM</p>
+              <div className="flex items-center justify-center gap-1.5 text-gray-400 mb-2">
+                <TrendingUp className="w-4 h-4 text-purple-400" />
+                <span>平均KPM</span>
+              </div>
               <p className="text-4xl font-bold text-purple-400">
                 {stats.avg_kpm}
               </p>
             </div>
             <div className="bg-slate-800 rounded-lg p-6 text-center">
-              <p className="text-gray-400 mb-2">平均精度</p>
+              <div className="flex items-center justify-center gap-1.5 text-gray-400 mb-2">
+                <Target className="w-4 h-4 text-green-400" />
+                <span>平均精度</span>
+              </div>
               <p className="text-4xl font-bold text-green-400">
                 {stats.avg_accuracy}%
               </p>
             </div>
             <div className="bg-slate-800 rounded-lg p-6 text-center">
-              <p className="text-gray-400 mb-2">総プレイ数</p>
+              <div className="flex items-center justify-center gap-1.5 text-gray-400 mb-2">
+                <Hash className="w-4 h-4 text-yellow-400" />
+                <span>総プレイ数</span>
+              </div>
               <p className="text-4xl font-bold text-yellow-400">
                 {stats.total_games}
               </p>

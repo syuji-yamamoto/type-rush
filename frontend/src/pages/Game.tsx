@@ -3,6 +3,7 @@ import { GameHeader } from "../components/game/GameHeader";
 import { GameSetup } from "../components/game/GameSetup";
 import { GameStats } from "../components/game/GameStats";
 import { TypingArea } from "../components/game/TypingArea";
+import { ComboDisplay } from "../components/game/ComboDisplay";
 import { IMEWarning } from "../components/game/IMEWarning";
 import { GameResult } from "../components/game/GameResult";
 import { BGMManager } from "../components/BGMManager";
@@ -17,21 +18,13 @@ import {
 
 /**
  * タイピングゲームのメインコンポーネント
- * ゲームの状態管理、UI表示、ユーザー操作の処理を担当します
  */
 function Game() {
   const { isAuthenticated } = useAuth();
-
-  // ゲームロジックのフック
   const { state, actions } = useGameLogic();
-
-  // スコア保存のフック
   const { scoreSaved, isSaving, handleSaveScore, resetScoreSaveState } =
     useScoreSave();
 
-  /**
-   * スコアを保存する処理
-   */
   const onSaveScore = async () => {
     try {
       await handleSaveScore(
@@ -50,15 +43,10 @@ function Game() {
         }
       );
     } catch (error) {
-      // エラーはuseScoreSaveフック内でログに記録されているため、
-      // ここでは特に何もしない（UIへのエラー表示などを追加する場合はここで実装）
       console.error("スコア保存処理でエラーが発生しました:", error);
     }
   };
 
-  /**
-   * ゲームを再開する処理
-   */
   const onRestart = () => {
     resetScoreSaveState();
     actions.startGame();
@@ -66,12 +54,10 @@ function Game() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
-      {/* BGM自動管理 - ゲーム状態と難易度に基づいてBGMを自動切り替え */}
       <BGMManager gameStatus={state.status} difficulty={state.difficulty} />
-
       <GameHeader />
 
-      <div className="w-full max-w-2xl">
+      <div className="w-full max-w-3xl">
         {/* ゲーム準備画面 */}
         {state.status === "ready" && (
           <GameSetup
@@ -104,8 +90,10 @@ function Game() {
               currentJapaneseText={state.currentJapaneseText}
               currentText={state.currentText}
               userInput={state.userInput}
+              lastInputCorrect={state.lastInputCorrect}
             />
 
+            <ComboDisplay combo={state.combo} />
             <IMEWarning show={state.imeWarning} />
 
             {/* 入力フィールド */}
@@ -116,7 +104,7 @@ function Game() {
               onChange={actions.handleInput}
               onCompositionStart={actions.handleCompositionStart}
               onCompositionEnd={actions.handleCompositionEnd}
-              className="w-full bg-slate-700 text-white text-xl p-4 rounded-lg outline-none focus:ring-2 focus:ring-cyan-400"
+              className="w-full bg-slate-700 text-white text-2xl p-5 rounded-lg outline-none focus:ring-2 focus:ring-cyan-400 transition-shadow"
               placeholder={
                 state.language === "japanese"
                   ? "ローマ字で入力..."
@@ -135,6 +123,7 @@ function Game() {
             accuracy={calculateAccuracy(state.correctChars, state.totalChars)}
             wordsCompleted={state.wordsCompleted}
             correctChars={state.correctChars}
+            maxCombo={state.maxCombo}
             language={state.language}
             difficulty={state.difficulty}
             isAuthenticated={isAuthenticated}

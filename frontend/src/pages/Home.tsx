@@ -52,9 +52,6 @@ function Home() {
         <p className="text-gray-300 text-xl mb-2">
           1分間のタイピングチャレンジ
         </p>
-        <p className="text-gray-500 text-sm mb-12">
-          Portfolio Project — 個人情報の収集は行っておりません
-        </p>
 
         <div className="space-y-4">
           <Link
@@ -88,9 +85,7 @@ function Home() {
                   disabled={isGuestLoading}
                   className="block w-64 mx-auto bg-green-500 hover:bg-green-600 disabled:bg-green-700 disabled:cursor-not-allowed text-white font-bold py-3 px-8 rounded-lg transition-all transform hover:scale-105"
                 >
-                  {isGuestLoading
-                    ? "ログイン中..."
-                    : "ゲストとしてプレイ"}
+                  {isGuestLoading ? "ログイン中..." : "ゲストとしてプレイ"}
                 </button>
                 <div className="flex justify-center gap-4">
                   <Link

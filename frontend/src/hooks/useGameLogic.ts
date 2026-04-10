@@ -44,6 +44,12 @@ export interface GameState {
   hasError: boolean;
   /** 使用済みテキストIDリスト */
   usedTextIds: string[];
+  /** 現在のコンボ数 */
+  combo: number;
+  /** 最大コンボ数 */
+  maxCombo: number;
+  /** 直前の入力が正解だったか（アニメーション用） */
+  lastInputCorrect: boolean | null;
 }
 
 /**
@@ -92,6 +98,11 @@ export const useGameLogic = () => {
   const [imeWarning, setImeWarning] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [usedTextIds, setUsedTextIds] = useState<string[]>([]);
+  const [combo, setCombo] = useState(0);
+  const [maxCombo, setMaxCombo] = useState(0);
+  const [lastInputCorrect, setLastInputCorrect] = useState<boolean | null>(
+    null
+  );
   const inputRef = useRef<HTMLInputElement>(null);
 
   /**
@@ -117,6 +128,9 @@ export const useGameLogic = () => {
     setTotalChars(0);
     setWordsCompleted(0);
     setHasError(false);
+    setCombo(0);
+    setMaxCombo(0);
+    setLastInputCorrect(null);
     setUsedTextIds([]); // 使用済みテキストIDリストをリセット
     setCurrentTextVariants([]); // テキストバリエーションをリセット
     setCurrentSessionId(`${Date.now()}-${Math.random()}`);
@@ -168,12 +182,18 @@ export const useGameLogic = () => {
         setCorrectChars((prev) => prev + 1);
         setTotalChars((prev) => prev + 1);
         setUserInput(value);
-        
+        setLastInputCorrect(true);
+        setCombo((prev) => {
+          const next = prev + 1;
+          setMaxCombo((max) => Math.max(max, next));
+          return next;
+        });
+
         // 表示テキストを動的に変更（マッチしたバリエーションに切り替え）
         if (matchingVariant !== currentText) {
           setCurrentText(matchingVariant);
         }
-        
+
         // IME警告を消す
         if (imeWarning) {
           setImeWarning(false);
@@ -196,6 +216,8 @@ export const useGameLogic = () => {
         playIncorrectSE();
         setUserInput(value);
         setHasError(true);
+        setLastInputCorrect(false);
+        setCombo(0);
       }
     } else if (newLength < prevLength) {
       // 削除時は入力を受け付ける
@@ -275,6 +297,9 @@ export const useGameLogic = () => {
     imeWarning,
     hasError,
     usedTextIds,
+    combo,
+    maxCombo,
+    lastInputCorrect,
   };
 
   const actions: GameActions = {
