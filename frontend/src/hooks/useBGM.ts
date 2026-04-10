@@ -108,6 +108,16 @@ export const useBGM = ({ volume, enabled }: UseBGMOptions): UseBGMReturn => {
           { once: true }
         );
 
+        audio.addEventListener(
+          "error",
+          () => {
+            const code = audio.error?.code;
+            const msg = audio.error?.message;
+            console.error(`BGM読み込み失敗 (${scene}): code=${code}, message=${msg}, src=${src}`);
+          },
+          { once: true }
+        );
+
         audio.load();
       };
 

@@ -110,17 +110,7 @@ function About() {
         <section>
           <h2 className="text-2xl font-bold text-white mb-3">開発者</h2>
           <div>
-            <p className="text-white font-semibold">Yamamoto Shuuji</p>
-            <div className="flex gap-3 mt-2">
-              <a
-                href="https://github.com/shuuuuuji"
-                className="text-cyan-400 hover:underline text-sm"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                GitHub
-              </a>
-            </div>
+            <p className="text-white font-semibold">Yamamoto Shuji</p>
           </div>
         </section>
 

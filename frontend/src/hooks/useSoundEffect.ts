@@ -30,6 +30,16 @@ export const useSoundEffect = ({
       const audio = new Audio(src);
       audio.volume = volume;
 
+      audio.addEventListener(
+        "error",
+        () => {
+          const code = audio.error?.code;
+          const msg = audio.error?.message;
+          console.error(`SE読み込み失敗 (${key}): code=${code}, message=${msg}, src=${src}`);
+        },
+        { once: true }
+      );
+
       audio.play().catch((err) => console.error("SE再生失敗:", err));
 
       const handleEnded = () => {
