@@ -1,4 +1,4 @@
-import type { Difficulty } from "../../api/sampleText";
+import type { Difficulty } from "../../types/types";
 
 interface GameStatsProps {
   timeLeft: number;

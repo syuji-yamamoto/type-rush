@@ -1,4 +1,4 @@
-import type { Difficulty, Language } from "../api/sampleText";
+import type { Difficulty, Language } from "../types/types";
 import {
   CHARS_PER_WORD_JAPANESE,
   CHARS_PER_WORD_ENGLISH,
