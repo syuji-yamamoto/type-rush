@@ -17,7 +17,7 @@ class Score extends Model
      */
     protected $fillable = [
         'user_id',
-        'wpm',
+        'kpm',
         'accuracy',
         'correct_chars',
         'words_completed',
@@ -55,16 +55,16 @@ class Score extends Model
 
         if ($scores->isEmpty()) {
             return [
-                'best_wpm' => 0,
-                'avg_wpm' => 0,
+                'best_kpm' => 0,
+                'avg_kpm' => 0,
                 'avg_accuracy' => 0,
                 'total_games' => 0,
             ];
         }
 
         return [
-            'best_wpm' => $scores->max('wpm'),
-            'avg_wpm' => round($scores->avg('wpm')),
+            'best_kpm' => $scores->max('kpm'),
+            'avg_kpm' => round($scores->avg('kpm')),
             'avg_accuracy' => round($scores->avg('accuracy')),
             'total_games' => $scores->count(),
         ];

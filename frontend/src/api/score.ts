@@ -3,7 +3,7 @@ import type { Difficulty, Language } from "../types/types";
 
 export interface Score {
   id: number;
-  wpm: number;
+  kpm: number;
   accuracy: number;
   correct_chars: number;
   words_completed: number;
@@ -13,14 +13,14 @@ export interface Score {
 }
 
 export interface ScoreStats {
-  best_wpm: number;
-  avg_wpm: number;
+  best_kpm: number;
+  avg_kpm: number;
   avg_accuracy: number;
   total_games: number;
 }
 
 export interface SaveScoreRequest {
-  wpm: number;
+  kpm: number;
   accuracy: number;
   correct_chars: number;
   words_completed: number;

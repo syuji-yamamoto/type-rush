@@ -1,7 +1,6 @@
-import type { Difficulty, Language } from "../types/types";
+import type { Difficulty } from "../types/types";
 import {
-  CHARS_PER_WORD_JAPANESE,
-  CHARS_PER_WORD_ENGLISH,
+  STANDARD_CHARS_PER_WORD,
   DEFAULT_ACCURACY,
   MINIMUM_ELAPSED_MINUTES,
   GAME_DURATION_SECONDS,
@@ -26,37 +25,29 @@ export const getDifficultyLabel = (difficulty: Difficulty): string => {
 };
 
 /**
- * 言語ごとの1ワードを構成する文字数を取得
- * 英語: 5文字 = 1ワード（一般的なWPM定義）
- * 日本語(ローマ字): 1語あたりの入力文字数が多くなるため、補正として大きめの値を使用
- * @param language 言語
- * @returns 1ワードあたりの文字数
- */
-export const getCharsPerWord = (language: Language): number => {
-  switch (language) {
-    case "japanese":
-      return CHARS_PER_WORD_JAPANESE;
-    default:
-      return CHARS_PER_WORD_ENGLISH;
-  }
-};
-
-/**
- * WPM（Words Per Minute）を計算
- * @param correctChars 正解した文字数
+ * KPM（Keystrokes Per Minute）を計算
+ * 言語に依存せず、キーストローク数/分で統一的に評価する
+ * @param correctChars 正解した文字数（＝キーストローク数）
  * @param timeLeft 残り時間（秒）
- * @param language 言語
- * @returns 計算されたWPM
+ * @returns 計算されたKPM
  */
-export const calculateWPM = (
+export const calculateKPM = (
   correctChars: number,
-  timeLeft: number,
-  language: Language
+  timeLeft: number
 ): number => {
   const minutes =
     (GAME_DURATION_SECONDS - timeLeft) / 60 || MINIMUM_ELAPSED_MINUTES;
-  const charsPerWord = getCharsPerWord(language);
-  return Math.round(correctChars / charsPerWord / minutes);
+  return Math.round(correctChars / minutes);
+};
+
+/**
+ * WPM換算値を計算（参考値として表示用）
+ * KPMを標準WPM換算（5キーストローク = 1ワード）で変換
+ * @param kpm KPM値
+ * @returns WPM換算値
+ */
+export const calculateWPMEquivalent = (kpm: number): number => {
+  return Math.round(kpm / STANDARD_CHARS_PER_WORD);
 };
 
 /**

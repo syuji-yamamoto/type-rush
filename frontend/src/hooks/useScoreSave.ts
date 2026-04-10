@@ -16,7 +16,7 @@ export interface ScoreSaveState {
  * スコア保存のパラメータ
  */
 export interface SaveScoreParams {
-  wpm: number;
+  kpm: number;
   accuracy: number;
   correctChars: number;
   wordsCompleted: number;
@@ -59,7 +59,7 @@ export const useScoreSave = () => {
     setIsSaving(true);
     try {
       await saveScore({
-        wpm: params.wpm,
+        kpm: params.kpm,
         accuracy: params.accuracy,
         correct_chars: params.correctChars,
         words_completed: params.wordsCompleted,

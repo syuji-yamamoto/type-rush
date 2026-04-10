@@ -17,7 +17,7 @@ class ScoreController extends Controller
     public function store(Request $request): JsonResponse
     {
         $request->validate([
-            'wpm' => 'required|integer|min:0',
+            'kpm' => 'required|integer|min:0',
             'accuracy' => 'required|integer|min:0|max:100',
             'correct_chars' => 'required|integer|min:0',
             'words_completed' => 'required|integer|min:0',
@@ -27,7 +27,7 @@ class ScoreController extends Controller
 
         $score = Score::create([
             'user_id' => $request->user()->id,
-            'wpm' => $request->wpm,
+            'kpm' => $request->kpm,
             'accuracy' => $request->accuracy,
             'correct_chars' => $request->correct_chars,
             'words_completed' => $request->words_completed,
@@ -40,7 +40,7 @@ class ScoreController extends Controller
             'message' => 'スコアを保存しました',
             'score' => [
                 'id' => $score->id,
-                'wpm' => $score->wpm,
+                'kpm' => $score->kpm,
                 'accuracy' => $score->accuracy,
                 'correct_chars' => $score->correct_chars,
                 'words_completed' => $score->words_completed,
@@ -79,7 +79,7 @@ class ScoreController extends Controller
             'data' => $scores->map(function ($score) {
                 return [
                     'id' => $score->id,
-                    'wpm' => $score->wpm,
+                    'kpm' => $score->kpm,
                     'accuracy' => $score->accuracy,
                     'correct_chars' => $score->correct_chars,
                     'words_completed' => $score->words_completed,
