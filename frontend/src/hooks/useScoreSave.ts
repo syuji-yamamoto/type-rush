@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { saveScore } from "../api/score";
-import type { Language, Difficulty } from "../api/sampleText";
+import type { Language, Difficulty } from "../types/types";
 
 /**
  * スコア保存状態のインターフェース

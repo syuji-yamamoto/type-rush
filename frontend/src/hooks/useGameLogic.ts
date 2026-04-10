@@ -1,11 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useAudioContext } from "../contexts/AudioContext";
-import type { Difficulty, Language } from "../api/sampleText";
-import {
-  fetchRandomTextWithFallback,
-  getFallbackText,
-} from "../api/sampleText";
-import type { JapaneseText } from "../types/types";
+import type { Difficulty, Language, JapaneseText } from "../types/types";
+import { getRandomText } from "../data";
 import {
   GAME_DURATION_SECONDS,
   TIMER_INTERVAL_MS,
@@ -47,7 +43,7 @@ export interface GameState {
   /** エラー状態 */
   hasError: boolean;
   /** 使用済みテキストIDリスト */
-  usedTextIds: number[];
+  usedTextIds: string[];
 }
 
 /**
@@ -59,9 +55,9 @@ export interface GameActions {
   /** 難易度を設定 */
   setDifficulty: (difficulty: Difficulty) => void;
   /** ゲームを開始 */
-  startGame: () => Promise<void>;
+  startGame: () => void;
   /** 入力を処理 */
-  handleInput: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
+  handleInput: (e: React.ChangeEvent<HTMLInputElement>) => void;
   /** IME入力開始を処理 */
   handleCompositionStart: () => void;
   /** IME入力終了を処理 */
@@ -91,60 +87,29 @@ export const useGameLogic = () => {
   const [correctChars, setCorrectChars] = useState(0);
   const [totalChars, setTotalChars] = useState(0);
   const [wordsCompleted, setWordsCompleted] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [imeWarning, setImeWarning] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const [usedTextIds, setUsedTextIds] = useState<number[]>([]);
+  const [usedTextIds, setUsedTextIds] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   /**
-   * APIからランダムなテキストを取得（使用済みテキストを除外）
+   * ローカルデータからランダムなテキストを取得して設定
    */
-  const fetchRandomText = async (): Promise<{ text: string; textVariants: string[]; id?: number }> => {
-    setIsLoading(true);
-    try {
-      const result = await fetchRandomTextWithFallback(
-        language,
-        difficulty,
-        usedTextIds
-      );
-      setCurrentJapaneseText(result.japaneseText);
-      return { text: result.text, textVariants: result.textVariants, id: result.id };
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  /**
-   * 次のテキストを取得して設定
-   */
-  const getNextText = async () => {
-    try {
-      const result = await fetchRandomText();
-      setCurrentText(result.text);
-      setCurrentTextVariants(result.textVariants);
-
-      // テキストIDがある場合は使用済みリストに追加
-      if (result.id !== undefined) {
-        setUsedTextIds((prev) => [...prev, result.id!]);
-      }
-    } catch (error) {
-      console.error("次のテキストの取得に失敗しました:", error);
-
-      // 想定外のエラー発生時もゲームが継続できるようにローカルフォールバックを使用
-      const fallbackResult = getFallbackText(language);
-      setCurrentJapaneseText(fallbackResult.japaneseText);
-      setCurrentText(fallbackResult.text);
-      setCurrentTextVariants(fallbackResult.textVariants);
-    }
+  const getNextText = () => {
+    const result = getRandomText(language, difficulty, usedTextIds);
+    setCurrentJapaneseText(result.japaneseText);
+    setCurrentText(result.text);
+    setCurrentTextVariants(result.textVariants);
+    setUsedTextIds((prev) => [...prev, result.id]);
   };
 
   /**
    * ゲームを開始
    * BGMの切り替えはBGMManagerが状態変化を検知して自動的に行います
    */
-  const startGame = async () => {
+  const startGame = () => {
     setGameState("playing");
     setUserInput("");
     setTimeLeft(GAME_DURATION_SECONDS);
@@ -156,7 +121,7 @@ export const useGameLogic = () => {
     setCurrentTextVariants([]); // テキストバリエーションをリセット
     setCurrentSessionId(`${Date.now()}-${Math.random()}`);
 
-    await getNextText();
+    getNextText();
     // レンダリング後に確実にフォーカスを当てる
     setTimeout(() => {
       inputRef.current?.focus();
@@ -181,7 +146,7 @@ export const useGameLogic = () => {
   /**
    * 入力を処理
    */
-  const handleInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (gameState !== "playing") return;
 
     const value = e.target.value.toLowerCase();
@@ -219,7 +184,7 @@ export const useGameLogic = () => {
           setWordsCompleted((prev) => prev + 1);
           setUserInput("");
           playCorrectSE();
-          await getNextText();
+          getNextText();
           // テキスト完了後、inputフィールドに自動フォーカスを戻す
           setTimeout(() => {
             inputRef.current?.focus();

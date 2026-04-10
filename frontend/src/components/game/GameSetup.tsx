@@ -1,4 +1,4 @@
-import type { Difficulty, Language } from "../../api/sampleText";
+import type { Difficulty, Language } from "../../types/types";
 
 interface GameSetupProps {
   language: Language;

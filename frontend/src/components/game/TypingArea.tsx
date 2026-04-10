@@ -1,5 +1,5 @@
 import type { JapaneseText } from "../../types/types";
-import type { Language } from "../../api/sampleText";
+import type { Language } from "../../types/types";
 
 interface TypingAreaProps {
   isLoading: boolean;

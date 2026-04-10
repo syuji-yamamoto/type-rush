@@ -1,5 +1,5 @@
 import apiClient from "./client";
-import type { Difficulty, Language } from "./sampleText";
+import type { Difficulty, Language } from "../types/types";
 
 export interface Score {
   id: number;
