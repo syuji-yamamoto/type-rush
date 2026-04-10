@@ -1,14 +1,10 @@
 import { Link } from "react-router-dom";
 import { AudioControl } from "../components/AudioControl";
-import { BGMManager } from "../components/BGMManager";
 import { Footer } from "../components/Footer";
 
 function About() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 pb-16">
-      {/* BGM自動管理 */}
-      <BGMManager />
-
       {/* 音量コントロール */}
       <div className="absolute top-4 right-4">
         <AudioControl />

@@ -1,190 +1,65 @@
-import React, {
-  createContext,
-  useContext,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useRef,
-} from "react";
-import { useAudio } from "../hooks/useAudio";
+import React, { createContext, useContext, ReactNode } from "react";
+import { useAudioConfig } from "../hooks/useAudioConfig";
+import { useBGM } from "../hooks/useBGM";
+import { useSoundEffect } from "../hooks/useSoundEffect";
+import type { BGMScene } from "../config/audioConfig";
 
-// 音源パスの定数定義
-export const AUDIO_PATHS = {
-  bgm: {
-    menu: new URL("../assets/bgm/menu.mp3", import.meta.url).href,
-    beginner: new URL("../assets/bgm/beginner.mp3", import.meta.url).href,
-    intermediate: new URL("../assets/bgm/intermediate.mp3", import.meta.url)
-      .href,
-    advanced: new URL("../assets/bgm/advanced.mp3", import.meta.url).href,
-  },
-  se: {
-    correct: new URL("../assets/se/correct.mp3", import.meta.url).href,
-    incorrect: new URL("../assets/se/incorrect.mp3", import.meta.url).href,
-    result: new URL("../assets/se/result.mp3", import.meta.url).href,
-  },
-} as const;
-
-// BGMシーンの型定義
-export type BGMScene =
-  | "menu" // /home, /login, /register, /results, /game(準備画面)
-  | "game-beginner" // /game 初級
-  | "game-intermediate" // /game 中級
-  | "game-advanced" // /game 上級
-  | "silent"; // BGMなし（ゲーム終了画面など）
+export type { BGMScene } from "../config/audioConfig";
 
 interface AudioContextValue {
-  // シーンベースのBGM管理
   setBGMScene: (scene: BGMScene) => void;
-  currentBGMScene: BGMScene;
-
-  // SE再生
   playCorrectSE: () => void;
   playIncorrectSE: () => void;
   playResultSE: () => void;
-
-  // 設定管理
-  // setVolume: (volume: number) => void; // 音量調整スライダーを削除したためコメントアウト。TODO:将来再実装する場合は復活させる
+  resetResultSEPlayed: () => void;
   setBGMEnabled: (enabled: boolean) => void;
   setSEEnabled: (enabled: boolean) => void;
+  setBGMVolume: (volume: number) => void;
+  setSEVolume: (volume: number) => void;
   config: {
-    bgm: {
-      volume: number;
-      enabled: boolean;
-    };
-    se: {
-      volume: number;
-      enabled: boolean;
-    };
+    bgmVolume: number;
+    seVolume: number;
+    bgmEnabled: boolean;
+    seEnabled: boolean;
   };
 }
 
-const AudioContext = createContext<AudioContextValue | null>(null);
+const AudioCtx = createContext<AudioContextValue | null>(null);
 
-interface AudioProviderProps {
-  children: ReactNode;
-}
+export const AudioProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  const audioConfig = useAudioConfig();
+  const { config } = audioConfig;
 
-export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
-  const audio = useAudio();
-  const currentSceneRef = useRef<BGMScene>("silent");
-  const resultSEPlayedRef = useRef<boolean>(false);
-  const bgmEnabledRef = useRef<boolean>(audio.config.bgm.enabled);
+  const bgm = useBGM({
+    volume: config.bgmVolume,
+    enabled: config.bgmEnabled,
+  });
 
-  // BGMシーンに対応するオーディオパスを取得
-  const getBGMPathForScene = useCallback((scene: BGMScene): string | null => {
-    switch (scene) {
-      case "menu":
-        return AUDIO_PATHS.bgm.menu;
-      case "game-beginner":
-        return AUDIO_PATHS.bgm.beginner;
-      case "game-intermediate":
-        return AUDIO_PATHS.bgm.intermediate;
-      case "game-advanced":
-        return AUDIO_PATHS.bgm.advanced;
-      case "silent":
-        return null;
-      default:
-        return null;
-    }
-  }, []);
+  const se = useSoundEffect({
+    volume: config.seVolume,
+    enabled: config.seEnabled,
+  });
 
-  // BGMシーンを設定
-  const setBGMScene = useCallback(
-    (scene: BGMScene) => {
-      // 同じシーンなら何もしない
-      if (currentSceneRef.current === scene) return;
-
-      currentSceneRef.current = scene;
-      const bgmPath = getBGMPathForScene(scene);
-
-      if (bgmPath) {
-        audio.play(bgmPath, "bgm", true);
-        resultSEPlayedRef.current = false;
-      } else {
-        audio.stop("bgm");
-      }
-    },
-    [audio, getBGMPathForScene]
-  );
-
-  // SE再生関数
-  const playCorrectSE = useCallback(() => {
-    audio.play(AUDIO_PATHS.se.correct, "se");
-  }, [audio]);
-
-  const playIncorrectSE = useCallback(() => {
-    audio.play(AUDIO_PATHS.se.incorrect, "se");
-  }, [audio]);
-
-  // ゲーム終了SE（一度だけ再生）
-  const playResultSE = useCallback(() => {
-    if (!resultSEPlayedRef.current) {
-      audio.play(AUDIO_PATHS.se.result, "se");
-      resultSEPlayedRef.current = true;
-    }
-  }, [audio]);
-
-  // 設定変更関数
-  const setBGMEnabled = useCallback(
-    (enabled: boolean) => {
-      audio.setEnabled("bgm", enabled);
-    },
-    [audio]
-  );
-
-  const setSEEnabled = useCallback(
-    (enabled: boolean) => {
-      audio.setEnabled("se", enabled);
-    },
-    [audio]
-  );
-
-  // BGM有効/無効の切り替えを監視して、適切に再生/停止
-  useEffect(() => {
-    const currentEnabled = audio.config.bgm.enabled;
-    const previousEnabled = bgmEnabledRef.current;
-
-    // BGMの有効状態が変わった時のみ処理
-    if (currentEnabled !== previousEnabled) {
-      if (currentEnabled) {
-        // BGMが有効化された場合、現在のシーンのBGMを再生
-        const bgmPath = getBGMPathForScene(currentSceneRef.current);
-        if (bgmPath) {
-          audio.play(bgmPath, "bgm", true);
-        }
-      }
-      bgmEnabledRef.current = currentEnabled;
-    }
-  }, [audio, audio.config.bgm.enabled, getBGMPathForScene]);
-
-  // コンポーネントのアンマウント時にオーディオをクリーンアップ
-  useEffect(() => {
-    return () => {
-      audio.stop();
-    };
-  }, [audio]);
-
-  const contextValue: AudioContextValue = {
-    setBGMScene,
-    currentBGMScene: currentSceneRef.current,
-    playCorrectSE,
-    playIncorrectSE,
-    playResultSE,
-    // setVolume: audio.setVolume, // 音量調整スライダーを削除したためコメントアウト
-    setBGMEnabled,
-    setSEEnabled,
-    config: audio.config,
+  const value: AudioContextValue = {
+    setBGMScene: bgm.setBGMScene,
+    playCorrectSE: se.playCorrect,
+    playIncorrectSE: se.playIncorrect,
+    playResultSE: se.playResult,
+    resetResultSEPlayed: se.resetResultPlayed,
+    setBGMEnabled: audioConfig.setBGMEnabled,
+    setSEEnabled: audioConfig.setSEEnabled,
+    setBGMVolume: audioConfig.setBGMVolume,
+    setSEVolume: audioConfig.setSEVolume,
+    config,
   };
 
-  return (
-    <AudioContext.Provider value={contextValue}>
-      {children}
-    </AudioContext.Provider>
-  );
+  return <AudioCtx.Provider value={value}>{children}</AudioCtx.Provider>;
 };
 
 export const useAudioContext = (): AudioContextValue => {
-  const context = useContext(AudioContext);
+  const context = useContext(AudioCtx);
   if (!context) {
     throw new Error("useAudioContext must be used within AudioProvider");
   }
