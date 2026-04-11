@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react";
 import type { JapaneseText } from "../../types/types";
-import type { Language } from "../../types/types";
 
 interface TypingAreaProps {
   isLoading: boolean;
-  language: Language;
   currentJapaneseText: JapaneseText | null;
   currentText: string;
   userInput: string;
@@ -13,7 +11,6 @@ interface TypingAreaProps {
 
 export function TypingArea({
   isLoading,
-  language,
   currentJapaneseText,
   currentText,
   userInput,
@@ -46,7 +43,7 @@ export function TypingArea({
       ) : (
         <>
           {/* 日本語の場合：ルビ表示 */}
-          {language === "japanese" && currentJapaneseText && (
+          {currentJapaneseText && (
             <div className="mb-4">
               <p className="text-3xl text-white mb-2 leading-relaxed">
                 <ruby>

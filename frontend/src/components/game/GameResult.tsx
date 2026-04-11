@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Trophy, Target, Type, Keyboard, Flame, Share2, Check } from "lucide-react";
-import type { Difficulty, Language } from "../../types/types";
+import type { Difficulty } from "../../types/types";
 import { calculateWPMEquivalent } from "../../utils/gameUtils";
 import { getRank } from "../../config/theme";
 
@@ -11,7 +11,6 @@ interface GameResultProps {
   wordsCompleted: number;
   correctChars: number;
   maxCombo: number;
-  language: Language;
   difficulty: Difficulty;
   isAuthenticated: boolean;
   scoreSaved: boolean;
@@ -27,7 +26,6 @@ export function GameResult({
   wordsCompleted,
   correctChars,
   maxCombo,
-  language,
   difficulty,
   isAuthenticated,
   scoreSaved,
@@ -44,7 +42,7 @@ export function GameResult({
       `TypeRush - タイピング結果`,
       `ランク: ${rankInfo.rank} (${rankInfo.label})`,
       `KPM: ${kpm} | 精度: ${accuracy}% | コンボ: ${maxCombo}`,
-      `言語: ${language === "english" ? "English" : "日本語"} / ${getDifficultyLabel(difficulty)}`,
+      `言語: 日本語 / ${getDifficultyLabel(difficulty)}`,
     ].join("\n");
 
     try {
@@ -119,8 +117,7 @@ export function GameResult({
 
         <div className="mt-4 pt-4 border-t border-gray-700 flex items-center justify-between">
           <p className="text-gray-400 text-sm">
-            言語: {language === "english" ? "English" : "日本語"} / 難易度:{" "}
-            {getDifficultyLabel(difficulty)}
+            言語: 日本語 / 難易度: {getDifficultyLabel(difficulty)}
           </p>
           <button
             onClick={handleShare}

@@ -25,8 +25,8 @@ class ScoreSeeder extends Seeder
                 'accuracy' => 94,
                 'correct_chars' => 325,
                 'words_completed' => 12,
-                'language' => 'english',
-                'difficulty' => 'advanced',
+                'language' => 'japanese',
+                'difficulty' => 'intermediate',
                 'played_at' => now()->subDays(4),
             ],
             [
@@ -35,8 +35,8 @@ class ScoreSeeder extends Seeder
                 'accuracy' => 96,
                 'correct_chars' => 360,
                 'words_completed' => 14,
-                'language' => 'english',
-                'difficulty' => 'advanced',
+                'language' => 'japanese',
+                'difficulty' => 'intermediate',
                 'played_at' => now()->subDays(3),
             ],
             [
@@ -46,7 +46,7 @@ class ScoreSeeder extends Seeder
                 'correct_chars' => 290,
                 'words_completed' => 10,
                 'language' => 'japanese',
-                'difficulty' => 'advanced',
+                'difficulty' => 'beginner',
                 'played_at' => now()->subDays(2),
             ],
             [
@@ -55,8 +55,8 @@ class ScoreSeeder extends Seeder
                 'accuracy' => 93,
                 'correct_chars' => 340,
                 'words_completed' => 13,
-                'language' => 'english',
-                'difficulty' => 'advanced',
+                'language' => 'japanese',
+                'difficulty' => 'intermediate',
                 'played_at' => now()->subDays(1),
             ],
             [
@@ -66,7 +66,7 @@ class ScoreSeeder extends Seeder
                 'correct_chars' => 375,
                 'words_completed' => 15,
                 'language' => 'japanese',
-                'difficulty' => 'advanced',
+                'difficulty' => 'intermediate',
                 'played_at' => now(),
             ],
             [
@@ -76,7 +76,7 @@ class ScoreSeeder extends Seeder
                 'correct_chars' => 89,
                 'words_completed' => 4,
                 'language' => 'japanese',
-                'difficulty' => 'advanced',
+                'difficulty' => 'beginner',
                 'played_at' => now()->subDays(3),
             ],
             [
@@ -85,8 +85,8 @@ class ScoreSeeder extends Seeder
                 'accuracy' => 39,
                 'correct_chars' => 101,
                 'words_completed' => 6,
-                'language' => 'english',
-                'difficulty' => 'advanced',
+                'language' => 'japanese',
+                'difficulty' => 'beginner',
                 'played_at' => now()->subDays(1),
             ],
             [
@@ -96,7 +96,7 @@ class ScoreSeeder extends Seeder
                 'correct_chars' => 200,
                 'words_completed' => 12,
                 'language' => 'japanese',
-                'difficulty' => 'advanced',
+                'difficulty' => 'intermediate',
                 'played_at' => now(),
             ],
         ];

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useAudioContext } from "../contexts/AudioContext";
 import type { BGMScene } from "../config/audioConfig";
-import type { Difficulty, Language, JapaneseText } from "../types/types";
+import type { Difficulty, JapaneseText } from "../types/types";
 import { getRandomText } from "../data";
 import {
   GAME_DURATION_SECONDS,
@@ -15,11 +15,9 @@ import {
 export interface GameState {
   /** ゲームの現在の状態 */
   status: "ready" | "playing" | "finished";
-  /** 選択中の言語 */
-  language: Language;
   /** 選択中の難易度 */
   difficulty: Difficulty;
-  /** 現在のテキスト（ローマ字または英語） */
+  /** 現在のテキスト（ローマ字） */
   currentText: string;
   /** 現在のテキストのバリエーション一覧 */
   currentTextVariants: string[];
@@ -57,8 +55,6 @@ export interface GameState {
  * ゲーム操作のインターフェース
  */
 export interface GameActions {
-  /** 言語を設定 */
-  setLanguage: (language: Language) => void;
   /** 難易度を設定 */
   setDifficulty: (difficulty: Difficulty) => void;
   /** ゲームを開始 */
@@ -82,7 +78,6 @@ export const useGameLogic = () => {
 
   // 状態管理
   const [gameState, setGameState] = useState<GameState["status"]>("ready");
-  const [language, setLanguage] = useState<Language>("japanese");
   const [difficulty, setDifficulty] = useState<Difficulty>("beginner");
   const [currentText, setCurrentText] = useState("");
   const [currentTextVariants, setCurrentTextVariants] = useState<string[]>([]);
@@ -109,7 +104,7 @@ export const useGameLogic = () => {
    * ローカルデータからランダムなテキストを取得して設定
    */
   const getNextText = () => {
-    const result = getRandomText(language, difficulty, usedTextIds);
+    const result = getRandomText(difficulty, usedTextIds);
     setCurrentJapaneseText(result.japaneseText);
     setCurrentText(result.text);
     setCurrentTextVariants(result.textVariants);
@@ -296,7 +291,6 @@ export const useGameLogic = () => {
 
   const state: GameState = {
     status: gameState,
-    language,
     difficulty,
     currentText,
     currentTextVariants,
@@ -317,7 +311,6 @@ export const useGameLogic = () => {
   };
 
   const actions: GameActions = {
-    setLanguage,
     setDifficulty,
     startGame,
     handleInput,

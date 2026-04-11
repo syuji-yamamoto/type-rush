@@ -32,7 +32,7 @@ function Game() {
           accuracy: calculateAccuracy(state.correctChars, state.totalChars),
           correctChars: state.correctChars,
           wordsCompleted: state.wordsCompleted,
-          language: state.language,
+          language: "japanese",
           difficulty: state.difficulty,
         },
         {
@@ -59,12 +59,10 @@ function Game() {
         {/* ゲーム準備画面 */}
         {state.status === "ready" && (
           <GameSetup
-            language={state.language}
             difficulty={state.difficulty}
             isLoading={state.isLoading}
             isAuthenticated={isAuthenticated}
             availableDifficulties={getAvailableDifficulties()}
-            onLanguageChange={actions.setLanguage}
             onDifficultyChange={actions.setDifficulty}
             onStart={actions.startGame}
             getDifficultyLabel={getDifficultyLabel}
@@ -84,7 +82,6 @@ function Game() {
 
             <TypingArea
               isLoading={state.isLoading}
-              language={state.language}
               currentJapaneseText={state.currentJapaneseText}
               currentText={state.currentText}
               userInput={state.userInput}
@@ -103,11 +100,7 @@ function Game() {
               onCompositionStart={actions.handleCompositionStart}
               onCompositionEnd={actions.handleCompositionEnd}
               className="w-full bg-slate-700 text-white text-2xl p-5 rounded-lg outline-none focus:ring-2 focus:ring-cyan-400 transition-shadow"
-              placeholder={
-                state.language === "japanese"
-                  ? "ローマ字で入力..."
-                  : "ここに入力..."
-              }
+              placeholder="ローマ字で入力..."
               autoFocus
               disabled={state.isLoading}
             />
@@ -122,7 +115,6 @@ function Game() {
             wordsCompleted={state.wordsCompleted}
             correctChars={state.correctChars}
             maxCombo={state.maxCombo}
-            language={state.language}
             difficulty={state.difficulty}
             isAuthenticated={isAuthenticated}
             scoreSaved={scoreSaved}
