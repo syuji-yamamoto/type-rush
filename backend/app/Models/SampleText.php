@@ -35,7 +35,6 @@ class SampleText extends Model
     /**
      * 言語の定数
      */
-    public const LANGUAGE_ENGLISH = 'english';
     public const LANGUAGE_JAPANESE = 'japanese';
 
     /**
@@ -43,7 +42,6 @@ class SampleText extends Model
      */
     public const DIFFICULTY_BEGINNER = 'beginner';
     public const DIFFICULTY_INTERMEDIATE = 'intermediate';
-    public const DIFFICULTY_ADVANCED = 'advanced';
 
     /**
      * 言語と難易度でランダムに1件取得

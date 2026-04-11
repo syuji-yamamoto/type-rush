@@ -54,4 +54,15 @@ export const japaneseBeginnerTexts: JapaneseTextEntry[] = [
   { id: "ja-b-048", display: "夢", reading: "ゆめ", romaji: "yume", romajiVariants: ["yume"], category: "daily" },
   { id: "ja-b-049", display: "道", reading: "みち", romaji: "michi", romajiVariants: ["michi", "miti"], category: "daily" },
   { id: "ja-b-050", display: "友", reading: "とも", romaji: "tomo", romajiVariants: ["tomo"], category: "daily" },
+  // 追加: 日常語彙
+  { id: "ja-b-051", display: "雲", reading: "くも", romaji: "kumo", romajiVariants: ["kumo"], category: "daily" },
+  { id: "ja-b-052", display: "虹", reading: "にじ", romaji: "niji", romajiVariants: ["niji", "nizi"], category: "daily" },
+  { id: "ja-b-053", display: "森林", reading: "しんりん", romaji: "shinrin", romajiVariants: ["shinrin", "sinrin", "shinnrinn", "sinnrinn"], category: "daily" },
+  { id: "ja-b-054", display: "氷", reading: "こおり", romaji: "koori", romajiVariants: ["koori", "kouri"], category: "daily" },
+  { id: "ja-b-055", display: "駅", reading: "えき", romaji: "eki", romajiVariants: ["eki"], category: "daily" },
+  { id: "ja-b-056", display: "店", reading: "みせ", romaji: "mise", romajiVariants: ["mise"], category: "daily" },
+  { id: "ja-b-057", display: "庭", reading: "にわ", romaji: "niwa", romajiVariants: ["niwa"], category: "daily" },
+  { id: "ja-b-058", display: "台所", reading: "だいどころ", romaji: "daidokoro", romajiVariants: ["daidokoro"], category: "daily" },
+  { id: "ja-b-059", display: "音楽", reading: "おんがく", romaji: "ongaku", romajiVariants: ["ongaku", "onngaku"], category: "daily" },
+  { id: "ja-b-060", display: "絵", reading: "え", romaji: "e", romajiVariants: ["e"], category: "daily" },
 ];

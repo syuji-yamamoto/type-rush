@@ -57,4 +57,15 @@ export const japaneseIntermediateTexts: JapaneseTextEntry[] = [
   { id: "ja-i-048", display: "笑顔で挨拶する", reading: "えがおであいさつする", romaji: "egaodeaisatsusuru", romajiVariants: ["egaodeaisatsusuru", "egaodeaisatusuru"], category: "daily" },
   { id: "ja-i-049", display: "星を眺める", reading: "ほしをながめる", romaji: "hoshiwonagameru", romajiVariants: ["hoshiwonagameru", "hosiwonagameru"], category: "daily" },
   { id: "ja-i-050", display: "桜が咲く", reading: "さくらがさく", romaji: "sakuragasaku", romajiVariants: ["sakuragasaku"], category: "daily" },
+  // 追加: 日常・プログラミング・ビジネス・ことわざ
+  { id: "ja-i-051", display: "旅行に行く", reading: "りょこうにいく", romaji: "ryokouniiku", romajiVariants: ["ryokouniiku", "ryokoniiku"], category: "daily" },
+  { id: "ja-i-052", display: "花火を見る", reading: "はなびをみる", romaji: "hanabiwomiru", romajiVariants: ["hanabiwomiru"], category: "daily" },
+  { id: "ja-i-053", display: "温泉に入る", reading: "おんせんにはいる", romaji: "onsennihairu", romajiVariants: ["onsennihairu", "onnsennnihairu"], category: "daily" },
+  { id: "ja-i-054", display: "バグを修正する", reading: "ばぐをしゅうせいする", romaji: "baguwoshuuseisuru", romajiVariants: ["baguwoshuuseisuru", "baguwosyuuseisuru", "baguwoshuseisuru"], category: "programming" },
+  { id: "ja-i-055", display: "コードを書く", reading: "こーどをかく", romaji: "ko-dowokaku", romajiVariants: ["ko-dowokaku", "koudowokaku"], category: "programming" },
+  { id: "ja-i-056", display: "テストを実行する", reading: "てすとをじっこうする", romaji: "tesutowojikkousuru", romajiVariants: ["tesutowojikkousuru", "tesutowozikkousuru", "tesutowojikkosuru"], category: "programming" },
+  { id: "ja-i-057", display: "資料を送付する", reading: "しりょうをそうふする", romaji: "shiryouwosoufusuru", romajiVariants: ["shiryouwosoufusuru", "siryouwosoufusuru", "shiryowosoufusuru"], category: "business" },
+  { id: "ja-i-058", display: "予定を確認する", reading: "よていをかくにんする", romaji: "yoteiwokakuninsuru", romajiVariants: ["yoteiwokakuninsuru", "yoteiwokakuninnsuru"], category: "business" },
+  { id: "ja-i-059", display: "猿も木から落ちる", reading: "さるもきからおちる", romaji: "sarumokikaraochiru", romajiVariants: ["sarumokikaraochiru", "sarumokikaraotiru"], category: "proverb" },
+  { id: "ja-i-060", display: "急がば回れ", reading: "いそがばまわれ", romaji: "isogabamaware", romajiVariants: ["isogabamaware"], category: "proverb" },
 ];

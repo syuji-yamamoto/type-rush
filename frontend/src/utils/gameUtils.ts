@@ -17,8 +17,6 @@ export const getDifficultyLabel = (difficulty: Difficulty): string => {
       return "初級";
     case "intermediate":
       return "中級";
-    case "advanced":
-      return "上級";
     default:
       return "中級";
   }
@@ -70,5 +68,5 @@ export const calculateAccuracy = (
  * @returns 利用可能な難易度の配列
  */
 export const getAvailableDifficulties = (): Difficulty[] => {
-  return ["beginner", "intermediate", "advanced"];
+  return ["beginner", "intermediate"];
 };

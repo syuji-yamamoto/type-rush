@@ -17,8 +17,8 @@ class SampleTextController extends Controller
     public function getRandom(Request $request): JsonResponse
     {
         $request->validate([
-            'language' => 'required|in:english,japanese',
-            'difficulty' => 'required|in:beginner,intermediate,advanced',
+            'language' => 'required|in:japanese',
+            'difficulty' => 'required|in:beginner,intermediate',
         ]);
 
         $language = $request->query('language');
@@ -27,9 +27,9 @@ class SampleTextController extends Controller
         // 認証状態による難易度制限
         // Bearerトークンの存在をチェック（auth:sanctumミドルウェア経由でなくても動作）
         $hasAuth = $request->bearerToken() !== null;
-        if (in_array($difficulty, ['intermediate', 'advanced']) && !$hasAuth) {
+        if ($difficulty === 'intermediate' && !$hasAuth) {
             return response()->json([
-                'message' => '中級・上級のテキストを取得するにはログインが必要です。',
+                'message' => '中級のテキストを取得するにはログインが必要です。',
             ], 403);
         }
 
@@ -61,8 +61,8 @@ class SampleTextController extends Controller
     public function getRandomList(Request $request): JsonResponse
     {
         $request->validate([
-            'language' => 'required|in:english,japanese',
-            'difficulty' => 'required|in:beginner,intermediate,advanced',
+            'language' => 'required|in:japanese',
+            'difficulty' => 'required|in:beginner,intermediate',
             'limit' => 'nullable|integer|min:1|max:50',
         ]);
 
@@ -73,9 +73,9 @@ class SampleTextController extends Controller
         // 認証状態による難易度制限
         // Bearerトークンの存在をチェック（auth:sanctumミドルウェア経由でなくても動作）
         $hasAuth = $request->bearerToken() !== null;
-        if (in_array($difficulty, ['intermediate', 'advanced']) && !$hasAuth) {
+        if ($difficulty === 'intermediate' && !$hasAuth) {
             return response()->json([
-                'message' => '中級・上級のテキストを取得するにはログインが必要です。',
+                'message' => '中級のテキストを取得するにはログインが必要です。',
             ], 403);
         }
 
@@ -108,7 +108,6 @@ class SampleTextController extends Controller
             'difficulties' => [
                 ['value' => 'beginner', 'label' => '初級'],
                 ['value' => 'intermediate', 'label' => '中級'],
-                ['value' => 'advanced', 'label' => '上級'],
             ],
         ]);
     }

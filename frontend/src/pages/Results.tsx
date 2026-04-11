@@ -184,7 +184,6 @@ function Results() {
                 <th className="text-left text-gray-300 p-4">日時</th>
                 <th className="text-center text-gray-300 p-4">KPM</th>
                 <th className="text-center text-gray-300 p-4">精度</th>
-                <th className="text-center text-gray-300 p-4">言語</th>
               </tr>
             </thead>
             <tbody>
@@ -214,9 +213,6 @@ function Results() {
                     >
                       {score.accuracy}%
                     </span>
-                  </td>
-                  <td className="text-center p-4 text-gray-400">
-                    {score.language === "english" ? "EN" : "JP"}
                   </td>
                 </tr>
               ))}

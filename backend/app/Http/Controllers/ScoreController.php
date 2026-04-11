@@ -21,8 +21,8 @@ class ScoreController extends Controller
             'accuracy' => 'required|integer|min:0|max:100',
             'correct_chars' => 'required|integer|min:0',
             'words_completed' => 'required|integer|min:0',
-            'language' => 'required|in:english,japanese',
-            'difficulty' => 'required|in:beginner,intermediate,advanced',
+            'language' => 'required|in:japanese',
+            'difficulty' => 'required|in:beginner,intermediate',
         ]);
 
         $score = Score::create([

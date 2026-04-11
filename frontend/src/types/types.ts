@@ -6,17 +6,10 @@ export type TextCategory =
   | "proverb"; // ことわざ・名言
 
 // 難易度
-export type Difficulty = "beginner" | "intermediate" | "advanced";
+export type Difficulty = "beginner" | "intermediate";
 
 // 言語
-export type Language = "english" | "japanese";
-
-// 英語テキストエントリ
-export interface EnglishTextEntry {
-  id: string;
-  text: string;
-  category?: TextCategory;
-}
+export type Language = "japanese";
 
 // 日本語テキストエントリ
 export interface JapaneseTextEntry {
