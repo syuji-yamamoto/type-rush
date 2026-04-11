@@ -21,8 +21,8 @@ return [
     'allowed_methods' => ['*'],
 
     // 許可するオリジンを設定する。
-    // TODO: 本番でドメイン決定後に修正すること
-    'allowed_origins' => explode(',', env('CORS_ALLOWED_ORIGINS', 'http://localhost:3000, http://localhost:5173')),
+    // デフォルトは開発用(localhost) + 本番(type-rush.com)。環境ごとに CORS_ALLOWED_ORIGINS で上書き可能。
+    'allowed_origins' => array_map('trim', explode(',', env('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://localhost:5173,https://type-rush.com'))),
 
     'allowed_origins_patterns' => [],
 
