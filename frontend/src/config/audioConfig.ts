@@ -27,7 +27,7 @@ export const AUDIO_PATHS = {
 export const AUDIO_DEFAULTS = {
   bgmVolume: 0.3,
   seVolume: 0.5,
-  bgmEnabled: true,
+  bgmEnabled: false,
   seEnabled: true,
 } as const;
 
