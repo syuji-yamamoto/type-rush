@@ -19,8 +19,8 @@ function About() {
           <p className="text-gray-300 leading-relaxed">
             TypeRushは、1分間のタイピングチャレンジを通じてタイピング速度と
             正確性を測定できるWebアプリケーションです。
-            日本語（ローマ字入力）と英語の両方に対応し、
-            2段階の難易度で練習できます。
+            日本語（ローマ字入力）に対応し、2段階の難易度で練習できます。
+            アカウント登録は不要で、誰でもすぐにプレイできます。
           </p>
         </section>
 
@@ -51,18 +51,9 @@ function About() {
               </ul>
             </div>
             <div>
-              <h3 className="text-cyan-400 font-semibold mb-2">バックエンド</h3>
-              <ul className="text-gray-300 space-y-1 text-sm">
-                <li>Laravel 12 (PHP)</li>
-                <li>MySQL</li>
-                <li>Laravel Sanctum</li>
-                <li>Docker</li>
-              </ul>
-            </div>
-            <div>
               <h3 className="text-cyan-400 font-semibold mb-2">インフラ</h3>
               <ul className="text-gray-300 space-y-1 text-sm">
-                <li>AWS (S3, CloudFront, Lightsail)</li>
+                <li>Cloudflare Pages（静的サイト）</li>
                 <li>GitHub Actions CI/CD</li>
               </ul>
             </div>
@@ -71,7 +62,6 @@ function About() {
               <ul className="text-gray-300 space-y-1 text-sm">
                 <li>Web Audio API</li>
                 <li>レスポンシブデザイン</li>
-                <li>多言語対応</li>
               </ul>
             </div>
           </div>
@@ -86,16 +76,14 @@ function About() {
             <li>
               ・本アプリは
               <strong className="text-white">
-                個人情報の収集を目的としていません
+                個人情報を一切収集しません
               </strong>
             </li>
-            <li>・登録時にメールアドレスは不要です（ニックネームのみ）</li>
+            <li>・アカウント登録やログインはありません</li>
             <li>
-              ・保存されるデータはニックネーム、パスワード（暗号化済み）、
-              ゲームスコアのみです
+              ・スコアはプレイ直後に画面へ表示するのみで、サーバーやブラウザに保存されません
             </li>
-            <li>・登録データはポートフォリオ公開終了時に全て削除されます</li>
-            <li>・データを第三者に提供・販売することはありません</li>
+            <li>・第三者に提供・販売するデータはありません</li>
           </ul>
         </section>
 
