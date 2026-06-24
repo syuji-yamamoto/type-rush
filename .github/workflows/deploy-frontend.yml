@@ -1,11 +1,10 @@
 name: Deploy Frontend to S3/CloudFront
 
+# Cloudflare Pages 移行に伴い、main への push での自動デプロイは停止。
+# 移行完了(Phase 7)までは AWS をロールバック先として残すため、
+# 手動実行(workflow_dispatch)のみ可能にしている。
 on:
-  push:
-    branches: [main]
-    paths:
-      - "frontend/**"
-  workflow_dispatch: # 手動実行用
+  workflow_dispatch: # 手動実行用（AWS へのロールバック用に当面残す）
 
 env:
   NODE_VERSION: "20"

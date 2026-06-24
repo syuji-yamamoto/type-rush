@@ -1,0 +1,3 @@
+# SPA fallback: すべてのパスを index.html に返し、React Router にルーティングを委ねる
+# (例: /game や /about を直リンク・リロードしても 404 にしない)
+/*    /index.html   200
