@@ -3,7 +3,6 @@ import type { Difficulty } from "../../types/types";
 interface GameSetupProps {
   difficulty: Difficulty;
   isLoading: boolean;
-  isAuthenticated: boolean;
   availableDifficulties: Difficulty[];
   onDifficultyChange: (difficulty: Difficulty) => void;
   onStart: () => void;

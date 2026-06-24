@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Trophy, Target, Type, Keyboard, Flame, Share2, Check } from "lucide-react";
+import { Target, Type, Keyboard, Flame, Share2, Check } from "lucide-react";
 import type { Difficulty } from "../../types/types";
 import { calculateWPMEquivalent } from "../../utils/gameUtils";
 import { getRank } from "../../config/theme";
@@ -12,10 +12,6 @@ interface GameResultProps {
   correctChars: number;
   maxCombo: number;
   difficulty: Difficulty;
-  isAuthenticated: boolean;
-  scoreSaved: boolean;
-  isSaving: boolean;
-  onSaveScore: () => void;
   onRestart: () => void;
   getDifficultyLabel: (diff: Difficulty) => string;
 }
@@ -27,10 +23,6 @@ export function GameResult({
   correctChars,
   maxCombo,
   difficulty,
-  isAuthenticated,
-  scoreSaved,
-  isSaving,
-  onSaveScore,
   onRestart,
   getDifficultyLabel,
 }: GameResultProps) {
@@ -137,44 +129,6 @@ export function GameResult({
             )}
           </button>
         </div>
-
-        {/* スコア保存セクション */}
-        {isAuthenticated && (
-          <div className="mt-4 pt-4 border-t border-gray-700">
-            {scoreSaved ? (
-              <p className="text-green-400">
-                <span className="flex items-center justify-center gap-2">
-                  <Trophy className="w-4 h-4" />
-                  スコアを保存しました
-                  <Link
-                    to="/results"
-                    className="underline ml-1 hover:text-green-300"
-                  >
-                    履歴を見る
-                  </Link>
-                </span>
-              </p>
-            ) : (
-              <button
-                onClick={onSaveScore}
-                disabled={isSaving}
-                className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-6 rounded-lg transition-all disabled:opacity-50"
-              >
-                {isSaving ? "保存中..." : "スコアを保存"}
-              </button>
-            )}
-          </div>
-        )}
-        {!isAuthenticated && (
-          <div className="mt-4 pt-4 border-t border-gray-700">
-            <p className="text-gray-400 text-sm">
-              <Link to="/login" className="text-cyan-400 hover:underline">
-                ログイン
-              </Link>
-              するとスコアを保存できます
-            </p>
-          </div>
-        )}
       </div>
       <div className="space-x-4">
         <button

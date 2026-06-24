@@ -1,4 +1,3 @@
-import { useAuth } from "../contexts/AuthContext";
 import { GameHeader } from "../components/game/GameHeader";
 import { GameSetup } from "../components/game/GameSetup";
 import { GameStats } from "../components/game/GameStats";
@@ -7,7 +6,6 @@ import { ComboDisplay } from "../components/game/ComboDisplay";
 import { IMEWarning } from "../components/game/IMEWarning";
 import { GameResult } from "../components/game/GameResult";
 import { useGameLogic } from "../hooks/useGameLogic";
-import { useScoreSave } from "../hooks/useScoreSave";
 import {
   getDifficultyLabel,
   calculateKPM,
@@ -19,35 +17,9 @@ import {
  * タイピングゲームのメインコンポーネント
  */
 function Game() {
-  const { isAuthenticated } = useAuth();
   const { state, actions } = useGameLogic();
-  const { scoreSaved, isSaving, handleSaveScore, resetScoreSaveState } =
-    useScoreSave();
-
-  const onSaveScore = async () => {
-    try {
-      await handleSaveScore(
-        {
-          kpm: calculateKPM(state.correctChars, state.timeLeft),
-          accuracy: calculateAccuracy(state.correctChars, state.totalChars),
-          correctChars: state.correctChars,
-          wordsCompleted: state.wordsCompleted,
-          language: "japanese",
-          difficulty: state.difficulty,
-        },
-        {
-          isAuthenticated,
-          difficulty: state.difficulty,
-          currentSessionId: state.currentSessionId,
-        }
-      );
-    } catch (error) {
-      console.error("スコア保存処理でエラーが発生しました:", error);
-    }
-  };
 
   const onRestart = () => {
-    resetScoreSaveState();
     actions.startGame();
   };
 
@@ -61,7 +33,6 @@ function Game() {
           <GameSetup
             difficulty={state.difficulty}
             isLoading={state.isLoading}
-            isAuthenticated={isAuthenticated}
             availableDifficulties={getAvailableDifficulties()}
             onDifficultyChange={actions.setDifficulty}
             onStart={actions.startGame}
@@ -116,10 +87,6 @@ function Game() {
             correctChars={state.correctChars}
             maxCombo={state.maxCombo}
             difficulty={state.difficulty}
-            isAuthenticated={isAuthenticated}
-            scoreSaved={scoreSaved}
-            isSaving={isSaving}
-            onSaveScore={onSaveScore}
             onRestart={onRestart}
             getDifficultyLabel={getDifficultyLabel}
           />
